@@ -155,6 +155,7 @@ class _ManageServiceState extends State<ManageService> {
       final str = await response.stream.bytesToString();
       var datas = GetVendorOrderModel.fromJson(json.decode(str));
       print("ssssssssssss ${datas} and ${datas.status} and ${datas.orders}");
+
       return GetVendorOrderModel.fromJson(json.decode(str));
     } else {
       return null;

@@ -38,7 +38,6 @@ class _ProductsServicesScreenState extends State<ProductsServicesScreen> {
         'POST', Uri.parse('${Apipath.getVendorProducts}'));
     request.fields.addAll({'vid': '${uid}'});
     print("this is request !! ${request.fields}");
-
     http.StreamedResponse response = await request.send();
     print("this is request !! 11111${response}");
     if (response.statusCode == 200) {

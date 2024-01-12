@@ -216,10 +216,8 @@ class _LoginState extends State<Login> {
         body: {"mobile": mobileController.text});
     print('resp=========>>>>>  ${Apipath.sendOtpUrl}');
     var result = SendOtpModel.fromJson(json.decode(response.body));
-
     msg = result.message;
     otp = result.otp;
-
     // otp = SendOtpModel.fromJson(json.decode(response.body)).otp;
     print("vvvvvvvOtp $otp");
     var snackBar = setSnackBar('${msg.toString()}');
@@ -229,13 +227,7 @@ class _LoginState extends State<Login> {
           isLoading = false;
         });
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    VerifyOtp(
-                      otp: otp.toString(),
-                      mobile: mobileController.text.toString(),
-                    )));
+            context, MaterialPageRoute(builder: (context) => VerifyOtp(otp: otp.toString(), mobile: mobileController.text.toString())));
         var snackBar = SnackBar(
           backgroundColor: AppColor().colorPrimary(),
           content: Text(
@@ -248,10 +240,9 @@ class _LoginState extends State<Login> {
         setState(() {
           isLoading = false;
         });
-
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
-    }else{
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
     return SendOtpModel.fromJson(json.decode(response.body));
@@ -571,8 +562,7 @@ class _LoginState extends State<Login> {
                           ):SizedBox.shrink(),
                        isMobile == true
                         ? Padding(
-                            padding: const EdgeInsets.only(
-                                top: 80, left: 20, right: 20),
+                            padding: const EdgeInsets.only(top: 80, left: 20, right: 20),
                             child:
                             InkWell(
                               onTap: (){
@@ -581,8 +571,8 @@ class _LoginState extends State<Login> {
                                 });
                                 if(mobileController.text.isNotEmpty && mobileController.text.length == 10){
                                   sendOtp();
-                                }else{
-                                  setState((){
+                                } else {
+                                  setState(() {
                                     isLoading = false;
                                   });
                                   Fluttertoast.showToast(msg: "Please enter valid mobile number!");
@@ -594,9 +584,11 @@ class _LoginState extends State<Login> {
                                   decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: AppColor().colorSecondary()),
                                   child: isLoading ?
                                       loadingWidget():
-                                  Center(child: Text("Send OTP", style: TextStyle(fontSize: 18, color: AppColor.PrimaryDark)))
+                                  Center(
+                                      child:
+                                  Text("Send OTP", style: TextStyle(fontSize: 18, color: AppColor.PrimaryDark)))
                               ),
-                            )
+                            ),
                             // AppBtn(
                             //   label: "Send OTP",
                             //   onPress: () {
@@ -623,47 +615,46 @@ class _LoginState extends State<Login> {
                             )
                         : SizedBox.shrink(),
                     SizedBox(
-                      height: 80,
+                      height: 30,
                     ),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   children: [
-                    //     Text(
-                    //       "Don't have an account?",
-                    //       style: TextStyle(
-                    //           fontWeight: FontWeight.w300,
-                    //           color: AppColor().colorBg1(),
-                    //           fontSize: 16),
-                    //     ),
-                    //     SizedBox(
-                    //       width: 3,
-                    //     ),
-                    //     GestureDetector(
-                    //       //   onTap: (){},
-                    //       child: Text(
-                    //         "Sign Up",
-                    //         style: TextStyle(
-                    //             color: AppColor().colorBg1(),
-                    //             fontSize: 16,
-                    //             fontWeight: FontWeight.w600,
-                    //             decoration: TextDecoration.underline),
-                    //       ),
-                    //       onTap: () {
-                    //         Navigator.push(
-                    //           context,
-                    //           MaterialPageRoute(builder: (context) => SignUp()
-                    //               //     VendorRegisteration(
-                    //               //   role: "0",
-                    //               // ),
-                    //               ),
-                    //         );
-                    //       },
-                    //     )
-                    //   ],
-                    // )
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Don't have an account?",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w300,
+                              color: AppColor().colorBg1(),
+                              fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 3,
+                        ),
+                        GestureDetector(
+                          //   onTap: (){},
+                          child: Text(
+                            "Sign Up",
+                            style: TextStyle(
+                                color: AppColor().colorBg1(),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                decoration: TextDecoration.underline),
+                          ),
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => SignUp()
+                                  //     VendorRegisteration(
+                                  //   role: "0",
+                                  // ),
+                                  ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),

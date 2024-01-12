@@ -16,7 +16,7 @@ import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart'as http;
-import 'package:image_picker_gallery_camera/image_picker_gallery_camera.dart';
+// import 'package:image_picker_gallery_camera/image_picker_gallery_camera.dart';
 // import 'package:image_picker_gallery_camera/image_picker_gallery_camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:place_picker/entities/location_result.dart';
@@ -29,8 +29,9 @@ import '../../utils/colors.dart';
 
 class EditNewProfile extends StatefulWidget {
   final Data? model;
+  GetProfileModel? profileModel;
   final String? upi, bankName, accNo, accHolderName, ifsc, accountType;
-  const EditNewProfile({Key? key, this.model, this.upi, this.bankName, this.accNo, this.accHolderName, this.ifsc, this.accountType}) : super(key: key);
+   EditNewProfile({Key? key, this.model, this.upi, this.bankName, this.accNo, this.accHolderName, this.ifsc, this.accountType,this.profileModel}) : super(key: key);
 
 
 
@@ -348,6 +349,7 @@ class _EditNewProfileState extends State<EditNewProfile> {
         // imagePath = File(pickedFile.path) ;
         // filePath = imagePath!.path.toString();
       });
+
     }
   }
 
@@ -485,61 +487,71 @@ class _EditNewProfileState extends State<EditNewProfile> {
   Widget imageProfile() {
     return Column(
       children: [
-        Material(
-          elevation: 2,
-          borderRadius: BorderRadius.circular(15),
-          child: InkWell(
-            onTap: () {
-              // requestPermission(context, 5);
-              // uploadRCFromCamOrGallary(context);
-            },
-            child: Center(
-              child: Container(
-                height: 100,
-                width: 100,
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(15)),
-                child:
-                // widget.model!.profileImage == null || widget.model!.profileImage == "" ?
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: profileImage != null
-                      ? Image.file(profileImage!, fit: BoxFit.cover)
-                      : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(child: Icon(Icons.person, size: 60)),
-                      Text("Profile Image")
-                    ],
+        Stack(
+          children: [
+            Material(
+              elevation: 2,
+              borderRadius: BorderRadius.circular(15),
+              child: InkWell(
+                onTap: () {
+
+                  // requestPermission(context, 5);
+                  // uploadRCFromCamOrGallary(context);
+                },
+                child: Center(
+                  child: Container(
+                      height: 100,
+                      width: 100,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(15)),
+                      child:
+                      // widget.model!.profileImage == null || widget.model!.profileImage == "" ?
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: profileImage != null
+                            ? Image.file(File(profileImage!.path), fit: BoxFit.cover)
+                            : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Center(child:Image.network('${widget.profileModel?.data?[0].profileImage}', fit: BoxFit.cover),),
+                          ],
+                        ),
+                      ),
+                    //   : ClipRRect(
+                    // borderRadius: BorderRadius.circular(15),
+                    // child:
+                    // // rcImage != null ?
+                    // Image.network(widget.model!.profileImage.toString(), fit: BoxFit.cover)
+                    // //     : Column(
+                    // //   mainAxisAlignment: MainAxisAlignment.center,
+                    // //   children: [
+                    // //     Center(child: Icon(Icons.person, size: 60)),
+                    // //     Text("Profile Image")
+                    // //   ],
+                    // // ),
+                    // )
                   ),
-                )
-                //   : ClipRRect(
-                // borderRadius: BorderRadius.circular(15),
-                // child:
-                // // rcImage != null ?
-                // Image.network(widget.model!.profileImage.toString(), fit: BoxFit.cover)
-                // //     : Column(
-                // //   mainAxisAlignment: MainAxisAlignment.center,
-                // //   children: [
-                // //     Center(child: Icon(Icons.person, size: 60)),
-                // //     Text("Profile Image")
-                // //   ],
-                // // ),
-                // )
+                ),
               ),
             ),
-          ),
+            Positioned(
+              top: 80,
+              left: 10,
+              child: InkWell(
+                onTap: () {
+                  requestPermission(context, 5);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 70),
+                  child: Icon(Icons.edit, size: 23),
+                ),
+              ),
+            ),
+          ],
         ),
-        InkWell(
-          onTap: () {
-            requestPermission(context, 5);
-          },
-          child: Padding(
-            padding: const EdgeInsets.only(left: 70),
-            child: Icon(Icons.edit, size: 25),
-          ),
-        ),
+        SizedBox(height: 5,),
+        Text("Profile Image")
       ],
     );
   }
@@ -556,35 +568,47 @@ class _EditNewProfileState extends State<EditNewProfile> {
         },
         child: Center(
           child: Container(
-            height: 100,
+            height: MediaQuery.of(context).size.height/3.7,
             width: MediaQuery.of(context).size.width - 60,
             decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(15)),
-            child: widget.model!.adharCard == "" || widget.model!.adharCard ==  null?
+            child:
+            // widget.model!.adharCard == "" || widget.model!.adharCard ==  null?
             ClipRRect(
               borderRadius: BorderRadius.circular(15),
               child: aadharImage != null
-                  ? Image.file(aadharImage!, fit: BoxFit.cover)
+                  ? Image.file(File(aadharImage!.path), fit: BoxFit.cover)
                   : Column(
                 children: [
-                  Center(child: Icon(Icons.upload_file_outlined, size: 60)),
-                  Text("Aadhar card")
+                  Center(child:ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child:
+                      //aadharImage != null?
+                      Image.network('${widget.model!.adharCard.toString()}', fit: BoxFit.cover)
+                    //     : Column(
+                    //   children: [
+                    //     Center(child: Icon(Icons.upload_file_outlined, size: 60)),
+                    //     Text("Aadhar card")
+                    //   ],
+                    // ),
+                  ),),
+                  // Text("Aadhar card")
                 ],
               ),
             )
-            : ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child:
-              //aadharImage != null?
-                Image.network('${widget.model!.adharCard.toString()}', fit: BoxFit.cover)
-              //     : Column(
-              //   children: [
-              //     Center(child: Icon(Icons.upload_file_outlined, size: 60)),
-              //     Text("Aadhar card")
-              //   ],
-              // ),
-            ),
+            // : ClipRRect(
+            //   borderRadius: BorderRadius.circular(15),
+            //   child:
+            //   //aadharImage != null?
+            //     Image.network('${widget.model!.adharCard.toString()}', fit: BoxFit.cover)
+            //   //     : Column(
+            //   //   children: [
+            //   //     Center(child: Icon(Icons.upload_file_outlined, size: 60)),
+            //   //     Text("Aadhar card")
+            //   //   ],
+            //   // ),
+            // ),
           ),
         ),
       ),
@@ -592,6 +616,7 @@ class _EditNewProfileState extends State<EditNewProfile> {
   }
 
   Widget imageAadharBack() {
+
     return Material(
       elevation: 2,
       borderRadius: BorderRadius.circular(15),
@@ -603,35 +628,47 @@ class _EditNewProfileState extends State<EditNewProfile> {
         },
         child: Center(
           child: Container(
-            height: 100,
+              height: MediaQuery.of(context).size.height/3.7,
             width: MediaQuery.of(context).size.width - 60,
             decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(15)),
-            child: widget.model!.adharCard == "" || widget.model!.adharCard ==  null?
+            child:
+            // widget.model!.adharCard == "" || widget.model!.adharCard ==  null?
             ClipRRect(
               borderRadius: BorderRadius.circular(15),
-              child: aadharImage != null
-                  ? Image.file(aadharImage!, fit: BoxFit.cover)
+              child: aaddarbackImage != null
+                  ? Image.file(File(aaddarbackImage!.path), fit: BoxFit.cover)
                   : Column(
                 children: [
-                  Center(child: Icon(Icons.upload_file_outlined, size: 60)),
-                  Text("Aadhar card")
+                  Center(child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child:
+                      //aadharImage != null?
+                      Image.network('${widget.model!.adharCardBack}', fit: BoxFit.cover)
+                    //     : Column(
+                    //   children: [
+                    //     Center(child: Icon(Icons.upload_file_outlined, size: 60)),
+                    //     Text("Aadhar card")
+                    //   ],
+                    // ),
+                  ),),
+                  // Text("Aadhar card")
                 ],
               ),
             )
-                : ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child:
-                //aadharImage != null?
-                Image.network('${widget.model!.adharCard.toString()}', fit: BoxFit.cover)
-              //     : Column(
-              //   children: [
-              //     Center(child: Icon(Icons.upload_file_outlined, size: 60)),
-              //     Text("Aadhar card")
-              //   ],
-              // ),
-            ),
+            //     : ClipRRect(
+            //     borderRadius: BorderRadius.circular(15),
+            //     child:
+            //     //aadharImage != null?
+            //     Image.network('${widget.model!.adharCard.toString()}', fit: BoxFit.cover)
+            //   //     : Column(
+            //   //   children: [
+            //   //     Center(child: Icon(Icons.upload_file_outlined, size: 60)),
+            //   //     Text("Aadhar card")
+            //   //   ],
+            //   // ),
+            // ),
           ),
         ),
       ),
@@ -639,6 +676,7 @@ class _EditNewProfileState extends State<EditNewProfile> {
   }
 
   Widget imagePan() {
+
     return Material(
       elevation: 2,
       borderRadius: BorderRadius.circular(15),
@@ -649,36 +687,50 @@ class _EditNewProfileState extends State<EditNewProfile> {
         },
         child: Center(
           child: Container(
-            height: 100,
+              height: MediaQuery.of(context).size.height/3.7,
             width: MediaQuery.of(context).size.width - 60,
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey),
               borderRadius: BorderRadius.circular(15),
             ),
-            child: widget.model!.pancard == "" || widget.model!.pancard ==  null?
+            child:
+            // widget.model!.pancard == "" || widget.model!.pancard ==  null?
             ClipRRect(
               borderRadius: BorderRadius.circular(15),
               child: panImage != null
-                  ? Image.file(panImage!, fit: BoxFit.cover)
+                  ? Image.file(File(panImage!.path), fit: BoxFit.cover)
                   : Column(
                 children: [
-                  Center(child: Icon(Icons.upload_file_outlined, size: 60)),
-                  Text("Pan Card")
+                  Center(child:ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child:
+                      // anImage != null ?
+                      Image.network('${widget.model!.pancard.toString()}', fit: BoxFit.cover)
+                    //     : Column(
+                    //   children: [
+                    //     Center(child: Icon(Icons.upload_file_outlined, size: 60)),
+                    //     Text("Pan Card")
+                    //   ],
+                    // ),
+                  ),
+                  ),
+                  // Text("Pan Card")
                 ],
               ),
-            ):ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child:
-              // anImage != null ?
-              Image.network('${widget.model!.pancard.toString()}', fit: BoxFit.cover)
-              //     : Column(
-              //   children: [
-              //     Center(child: Icon(Icons.upload_file_outlined, size: 60)),
-              //     Text("Pan Card")
-              //   ],
-              // ),
-            ),
-          ),
+            )
+            // ClipRRect(
+            //   borderRadius: BorderRadius.circular(15),
+            //   child:
+            //   // anImage != null ?
+            //   Image.network('${widget.model!.pancard.toString()}', fit: BoxFit.cover)
+            //   //     : Column(
+            //   //   children: [
+            //   //     Center(child: Icon(Icons.upload_file_outlined, size: 60)),
+            //   //     Text("Pan Card")
+            //   //   ],
+            //   // ),
+            // ),
+          )
         ),
       ),
     );
@@ -910,31 +962,31 @@ class _EditNewProfileState extends State<EditNewProfile> {
       ].request();
 // You can request multiple permissions at once.
       if(statuses[Permission.camera]== PermissionStatus.granted&&statuses[Permission.storage]== PermissionStatus.granted){
-        getImage(ImgSource.Both, context,i);
-      }else{
+        // getImage(ImgSource.Both, context,i);
+      } else {
         if (await Permission.camera.isDenied||await Permission.storage.isDenied) {
           // The user opted to never again see the permission request dialog for this
           // app. The only way to change the permission's status now is to let the
           // user manually enable it in the system settings.
           openAppSettings();
-        }else{
+        } else {
           setSnackBar("Oops you just denied the permission",);
         }
       }
     }
   }
 
-  Future getImage(ImgSource source, BuildContext context,int i) async {
-    var image = await ImagePickerGC.pickImage(
-      context: context,
-      source: source,
-      cameraIcon: Icon(
-        Icons.add,
-        color: Colors.red,
-      ), //cameraIcon and galleryIcon can change. If no icon provided default icon will be present
-    );
-    getCropImage(context, i, image);
-  }
+  // Future getImage(ImgSource source, BuildContext context,int i) async {
+  //   var image = await ImagePickerGC.pickImage(
+  //     context: context,
+  //     source: source,
+  //     cameraIcon: Icon(
+  //       Icons.add,
+  //       color: Colors.red,
+  //     ), //cameraIcon and galleryIcon can change. If no icon provided default icon will be present
+  //   );
+  //   getCropImage(context, i, image);
+  // }
 
   void getCropImage(BuildContext context,int i,var image) async {
     CroppedFile? croppedFile = await ImageCropper.platform.cropImage(
@@ -952,16 +1004,17 @@ class _EditNewProfileState extends State<EditNewProfile> {
       if(i==1){
         aadharImage = File(croppedFile!.path);
       } else  if(i==2){
-        panImage = File(croppedFile!.path);
+        aaddarbackImage = File(croppedFile!.path);
       }
       else  if(i==3){
-        rcImage = File(croppedFile!.path);
+        panImage = File(croppedFile!.path);
       }
       else if(i==4){
-        drivingImage = File(croppedFile!.path);
+        rcImage = File(croppedFile!.path);
       } else if(i==5){
         profileImage = File(croppedFile!.path);
       }
+      print('-----------image>>>>>>>${profileImage}');
       // else if(i==6){
       //   insuranceImage = File(croppedFile!.path);
       // }
@@ -978,6 +1031,7 @@ class _EditNewProfileState extends State<EditNewProfile> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    checkingLogin();
     nameController = TextEditingController(text: widget.model!.uname.toString());
     emailController = TextEditingController(text: widget.model!.email.toString());
     mobileController = TextEditingController(text: widget.model!.mobile.toString());
@@ -999,7 +1053,7 @@ class _EditNewProfileState extends State<EditNewProfile> {
       accTypeValue = widget.accountType;
     }
     // bankNameController = TextEditingController(text: widget.model!.bandDetails.toString());
-    checkingLogin();
+
     // _getFoodVarients();
   }
 
@@ -1099,7 +1153,7 @@ class _EditNewProfileState extends State<EditNewProfile> {
                             // SizedBox(height: 30,),
 
                             Padding(
-                              padding: EdgeInsets.only(left: 10, bottom: 0),
+                              padding: EdgeInsets.only(left: 10, bottom: 0,top:20),
                               child: Text('Name'),
                             ),
                             SizedBox(
@@ -1756,7 +1810,7 @@ class _EditNewProfileState extends State<EditNewProfile> {
                   )))
             ),
             Positioned(
-              top:5,
+              top:0,
               // left: MediaQuery.of(context).size.width * .38,
               child: Center(
                 child: Container(
@@ -1772,6 +1826,7 @@ class _EditNewProfileState extends State<EditNewProfile> {
                 ),
               ),
             ),
+
           ],
         ),
       ),

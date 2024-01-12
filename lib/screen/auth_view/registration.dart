@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fixerking/api/api_path.dart';
 import 'package:fixerking/new%20model/registration_model.dart';
@@ -18,13 +19,15 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:image_picker_gallery_camera/image_picker_gallery_camera.dart';
+// import 'package:image_picker_gallery_camera/image_picker_gallery_camera.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:place_picker/entities/location_result.dart';
 
+import '../../modal/StateModel.dart';
 import '../../new model/cities_model.dart';
 import '../../new model/event_category_model.dart';
+import '../../validation/form_validation.dart';
 import '../location_details.dart';
 
 class VendorRegisteration extends StatefulWidget {
@@ -39,11 +42,17 @@ class VendorRegisteration extends StatefulWidget {
 class _VendorRegisterationState extends State<VendorRegisteration> {
 
   String? bankValue;
-  String? categoryValue;
+  CityData? cityValue;
+  StataData? stateValue;
   String? catValue;
   var accTypeValue;
   File? rcImage;
+  String? stateName;
+  String? cityName;
   File? aadharImage;
+  File? aadharBack;
+  File? profileImage;
+  File? catalogImage;
   File? panImage;
   File? drivingImage;
 
@@ -145,6 +154,17 @@ class _VendorRegisterationState extends State<VendorRegisteration> {
   TextEditingController bankNameController = TextEditingController();
   TextEditingController referallController = TextEditingController();
   TextEditingController storeDescriptionController = TextEditingController();
+  TextEditingController educationCtr = TextEditingController();
+  TextEditingController professionalCtr = TextEditingController();
+  TextEditingController sanskritCtr = TextEditingController();
+  TextEditingController languageCtr = TextEditingController();
+  TextEditingController vedaCtr = TextEditingController();
+  TextEditingController yearBusinessCtr = TextEditingController();
+  TextEditingController locationCoveredCtr = TextEditingController();
+  TextEditingController casteCtr = TextEditingController();
+  TextEditingController testimonialsCtr = TextEditingController();
+  TextEditingController pincodeCtr = TextEditingController();
+  TextEditingController areaCtr = TextEditingController();
 
   void containerForSheet<T>({BuildContext? context, Widget? child}) {
     showCupertinoModalPopup<T>(
@@ -153,137 +173,57 @@ class _VendorRegisterationState extends State<VendorRegisteration> {
     ).then<void>((T? value) {});
   }
 
-  uploadRCFromCamOrGallary(BuildContext context) {
-    containerForSheet<String>(
-      context: context,
-      child: CupertinoActionSheet(
-        actions: <Widget>[
-          CupertinoActionSheetAction(
-            child: Text(
-              "Camera",
-              style: TextStyle(color: Colors.black, fontSize: 15),
-            ),
-            onPressed: () {
-              getRCFromCamera();
-              Navigator.of(context, rootNavigator: true).pop("Discard");
-            },
-          ),
-          CupertinoActionSheetAction(
-            child: Text(
-              "Photo & Video Library",
-              style: TextStyle(color: Colors.black, fontSize: 15),
-            ),
-            onPressed: () {
-              getRCFromGallery();
-              Navigator.of(context, rootNavigator: true).pop("Discard");
-            },
-          ),
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          child: Text(
-            "Cancel",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-          isDefaultAction: true,
-          onPressed: () {
-            // Navigator.pop(context, 'Cancel');
-            Navigator.of(context, rootNavigator: true).pop("Discard");
-          },
-        ),
-      ),
-    );
-  }
 
-  Future<void> getRCFromCamera() async {
+  Future<void> getAadharBackFromCamera() async {
     PickedFile? pickedFile = await ImagePicker().getImage(
       source: ImageSource.camera,
     );
     if (pickedFile != null) {
       setState(() {
-        rcImage = File(pickedFile.path);
+        aadharBack = File(pickedFile.path);
         // imagePath = File(pickedFile.path) ;
         // filePath = imagePath!.path.toString();
       });
+      print("this is image path from camera ${aadharBack.toString()}");
     }
   }
 
-  Future<void> getRCFromGallery() async {
+  Future<void> getAadharBackFromGallery() async {
     PickedFile? pickedFile = await ImagePicker().getImage(
       source: ImageSource.gallery,
     );
     if (pickedFile != null) {
       setState(() {
-        rcImage = File(pickedFile.path);
+        aadharBack = File(pickedFile.path);
         // imagePath = File(pickedFile.path) ;
         // filePath = imagePath!.path.toString();
       });
     }
   }
 
-  uploadAadharFromCamOrGallary(BuildContext context) {
-    containerForSheet<String>(
-      context: context,
-      child: CupertinoActionSheet(
-        actions: <Widget>[
-          CupertinoActionSheetAction(
-            child: Text(
-              "Camera",
-              style: TextStyle(color: Colors.black, fontSize: 15),
-            ),
-            onPressed: () {
-              getAadharFromCamera();
-              Navigator.of(context, rootNavigator: true).pop("Discard");
-            },
-          ),
-          CupertinoActionSheetAction(
-            child: Text(
-              "Photo & Video Library",
-              style: TextStyle(color: Colors.black, fontSize: 15),
-            ),
-            onPressed: () {
-              getAadharFromGallery();
-              Navigator.of(context, rootNavigator: true).pop("Discard");
-            },
-          ),
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          child: Text(
-            "Cancel",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-          isDefaultAction: true,
-          onPressed: () {
-            // Navigator.pop(context, 'Cancel');
-            Navigator.of(context, rootNavigator: true).pop("Discard");
-          },
-        ),
-      ),
-    );
-  }
-
-  Future<void> getAadharFromCamera() async {
+  Future<void> getProfileFromCamera() async {
     PickedFile? pickedFile = await ImagePicker().getImage(
       source: ImageSource.camera,
     );
     if (pickedFile != null) {
       setState(() {
-        aadharImage = File(pickedFile.path);
+        profileImage = File(pickedFile.path);
         // imagePath = File(pickedFile.path) ;
         // filePath = imagePath!.path.toString();
       });
-      print("this is image path from camera ${aadharImage.toString()}");
+      print("this is image path from camera ${profileImage.toString()}");
 
     }
 
   }
 
-  Future<void> getAadharFromGallery() async {
+  Future<void> getProfileFromGallery() async {
     PickedFile? pickedFile = await ImagePicker().getImage(
       source: ImageSource.gallery,
     );
     if (pickedFile != null) {
       setState(() {
-        aadharImage = File(pickedFile.path);
+        profileImage = File(pickedFile.path);
         // imagePath = File(pickedFile.path) ;
         // filePath = imagePath!.path.toString();
       });
@@ -357,47 +297,6 @@ class _VendorRegisterationState extends State<VendorRegisteration> {
     }
   }
 
-  uploaddrivingFromCamOrGallary(BuildContext context) {
-    containerForSheet<String>(
-      context: context,
-      child: CupertinoActionSheet(
-        actions: <Widget>[
-          CupertinoActionSheetAction(
-            child: Text(
-              "Camera",
-              style: TextStyle(color: Colors.black, fontSize: 15),
-            ),
-            onPressed: () {
-              getdrivingFromCamera();
-              Navigator.of(context, rootNavigator: true).pop("Discard");
-            },
-          ),
-          CupertinoActionSheetAction(
-            child: Text(
-              "Photo & Video Library",
-              style: TextStyle(color: Colors.black, fontSize: 15),
-            ),
-            onPressed: () {
-              getdrivingFromGallery();
-              Navigator.of(context, rootNavigator: true).pop("Discard");
-            },
-          ),
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          child: Text(
-            "Cancel",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-          isDefaultAction: true,
-          onPressed: () {
-            // Navigator.pop(context, 'Cancel');
-            Navigator.of(context, rootNavigator: true).pop("Discard");
-          },
-        ),
-      ),
-    );
-  }
-
   Future<void> getdrivingFromCamera() async {
     PickedFile? pickedFile = await ImagePicker().getImage(
       source: ImageSource.camera,
@@ -464,7 +363,8 @@ class _VendorRegisterationState extends State<VendorRegisteration> {
       borderRadius: BorderRadius.circular(15),
       child: InkWell(
         onTap: () {
-          getImage(ImgSource.Both, context,1);
+          showAlertDialog(context, "aadharImage");
+          // getImage(ImgSource.Both, context,1);
           // requestPermission(context, 1);
           //uploadAadharFromCamOrGallary(context);
         },
@@ -483,7 +383,207 @@ class _VendorRegisterationState extends State<VendorRegisteration> {
                 children: [
                   Center(
                       child: Icon(Icons.upload_file_outlined, size: 60)),
-                  Text("Aadhar card")
+                  Text("Aadhaar Card")
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+
+  Widget imageProfile() {
+    return Material(
+      elevation: 2,
+      borderRadius: BorderRadius.circular(15),
+      child: InkWell(
+        onTap: () {
+          showAlertDialog(context, "profileImage");
+          // requestPermission(context, 1);
+          //uploadAadharFromCamOrGallary(context);
+        },
+        child: Center(
+          child: Container(
+            height: 100,
+            width: MediaQuery.of(context).size.width - 60,
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(15)),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: profileImage != null
+                  ? Image.file(profileImage!, fit: BoxFit.cover)
+                  : Column(
+                children: [
+                  Center(
+                      child: Icon(Icons.upload_file_outlined, size: 60)),
+                  Text("Profile Imaage")
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  showAlertDialog(BuildContext context, String type) {
+    AlertDialog alert = AlertDialog(
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 25),
+          child: Container(
+            height: 250,
+            color: Colors.transparent, //could change this to Color(0xFF737373),
+            //so you don't have to change MaterialApp canvasColor
+            child: Container(
+                decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius:  BorderRadius.only(
+                        topLeft: Radius.circular(10.0),
+                        topRight: Radius.circular(10.0))),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      height: 5,
+                      width: 150,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(75),
+                          color: Colors.grey),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    const Text(
+                      'Select Any One Option',
+                      style: TextStyle(
+                          fontSize: 17,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        print(type);
+                        Navigator.of(context).pop();
+                        // pickImage(ImageSource.gallery, type);
+                        pickImage(ImageSource.gallery, type);
+                      },
+                      child: Card(
+                        elevation: 5,
+                        child: Container(
+                          width: 200,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8)),
+                          child: const Center(child: Text('Select From Gallery')),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        print(type);
+                        Navigator.of(context).pop();
+                        pickImage(ImageSource.camera, type);
+                      },
+                      child: Card(
+                        elevation: 5,
+                        child: Container(
+                          width: 200,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8)),
+                          child: Center(child: Text('Select From Camera')),
+                        ),
+                      ),
+                    )
+                  ],
+                )),
+          ),
+        ),
+      ],
+    );
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+
+  Widget imageCatalog() {
+    return Material(
+      elevation: 2,
+      borderRadius: BorderRadius.circular(15),
+      child: InkWell(
+        onTap: () {
+          showAlertDialog(context, "catalogImage");
+          // getImage(ImgSource.Both, context, 7);
+          // pickImage(ImageSource.gallery, type!);
+        },
+        child: Center(
+          child: Container(
+            height: 100,
+            width: MediaQuery.of(context).size.width - 60,
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(15)),
+             child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: catalogImage != null
+                  ? Image.file(catalogImage!, fit: BoxFit.cover)
+                  : Column(
+                children: [
+                  Center(
+                      child: Icon(Icons.upload_file_outlined, size: 60)
+                  ),
+                  Text("Image Catalog")
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget imageAadharBack() {
+    return Material(
+      elevation: 2,
+      borderRadius: BorderRadius.circular(15),
+      child: InkWell(
+        onTap: () {
+          showAlertDialog(context, "aadharBackImage");
+          // getImage(ImgSource.Both, context, 5);
+        },
+        child: Center(
+          child: Container(
+            height: 100,
+            width: MediaQuery.of(context).size.width - 60,
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(15)),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: aadharBack != null
+                  ? Image.file(aadharBack!, fit: BoxFit.cover)
+                  : Column(
+                  children: [
+                  Center(
+                      child: Icon(Icons.upload_file_outlined, size: 60)),
+                  Text("Aadhaar Card Back")
                 ],
               ),
             ),
@@ -499,7 +599,8 @@ class _VendorRegisterationState extends State<VendorRegisteration> {
       borderRadius: BorderRadius.circular(15),
       child: InkWell(
         onTap: () {
-          requestPermission(context, 2);
+          showAlertDialog(context, "pancard");
+          // requestPermission(context, 2);
           // uploadPanFromCamOrGallary(context);
         },
         child: Center(
@@ -569,7 +670,6 @@ class _VendorRegisterationState extends State<VendorRegisteration> {
     // });
     print("checking date submit request");
     var headers = {'Cookie': 'ci_session=cf2fmpq7vue0kthvj5s046uv4m2j5r11'};
-
     var request = http.MultipartRequest(
         'POST', Uri.parse('${Apipath.vendorRegistrationUrl}'));
     request.fields.addAll({
@@ -580,186 +680,168 @@ class _VendorRegisterationState extends State<VendorRegisteration> {
       'lat': '${pickLat.toString()}',
       'lang': '${pickLong.toString()}',
       'address': '${addressController.text.toString()}',
-      'password': '${passwordController.text.toString()}',
-      'friend_code': '${referallController.text.toString()}',
-      'bank_upi': isUpi
-          ? '{"account_holder_name" : "${accountHolderController.text.toString()}","account_number" : "${accountNoController.text.toString()}","bank_name" : "${bankNameController.text.toString()}","account_type": "${accTypeValue.toString()}","ifsc_code" : "${ifscController.text.toString()}"}'
-          : '{"UPI" : "${upiController.text.toString()}"}'
+      "educational_qualification": educationCtr.text,
+      "pincode": pincodeCtr.text,
+      "area" : areaCtr.text,
+      "state" : stateName.toString(),
+      "city" : cityName.toString(),
+      "year_in_business" : yearBusinessCtr.text,
+      "locations_covered": locationCoveredCtr.text,
+      "testimonials": testimonialsCtr.text,
+      "professional_qualification" : professionalCtr.text,
+      "sanskrit_qualification": sanskritCtr.text,
+      "languages" : languageCtr.text,
+      "caste" : casteCtr.text,
+      "veda_studies" : vedaCtr.text,
+       "service_category": selectCatItems.toString()
+      // 'bank_upi': isUpi
+      //     ? '{"account_holder_name" : "${accountHolderController.text.toString()}","account_number" : "${accountNoController.text.toString()}","bank_name" : "${bankNameController.text.toString()}","account_type": "${accTypeValue.toString()}","ifsc_code" : "${ifscController.text.toString()}"}'
+      //     : '{"UPI" : "${upiController.text.toString()}"}'
     });
-print("api url here  ${Apipath.vendorRegistrationUrl}");
+
+    print("api url here  ${Apipath.vendorRegistrationUrl}");
+
     ///orderfood
-    if (type == "1") {
-      request.fields.addAll({
-        'store_name': '${storeNameController.text.toString()}',
-        'fssai': '${fssaiController.text.toString()}',
-        'categories_id': '${selectCatItems.toString()}',
-        'gst_no': '${gstController.text.toString()}',
-        'store_description': '${storeDescriptionController.text.toString()}',
-        'restro_type': '${restroType.toString()}'
-      });
-    }
-    String delType = '';
-    if(deliveryTypeValue == "Delivery Only"){
-      setState((){
-        delType = 'delivery_only';
-      });
-    }else if(deliveryTypeValue == "Ride Only"){
-      setState((){
-        delType = 'ride_only';
-      });
-    }else{
-      setState((){
-        delType = 'both';
-      });
-    }
+    // if (type == "1") {
+    //   request.fields.addAll({
+    //     'store_name': '${storeNameController.text.toString()}',
+    //     'fssai': '${fssaiController.text.toString()}',
+    //     'categories_id': '${selectCatItems.toString()}',
+    //     'gst_no': '${gstController.text.toString()}',
+    //     'store_description': '${storeDescriptionController.text.toString()}',
+    //     'restro_type': '${restroType.toString()}'
+    //   });
+    // }
 
-    ///2wheeler
-    if (type == "2" || type == "3" || type == "4") {
-      request.fields.addAll({
-        'vehicle_no': '${vehicleController.text.toString()}',
-        'city_id': '${categoryValue.toString()}',
-        'delivery_type' : '${delType.toString()}'
-      });
-      if (rcImage != null) {
-        request.files.add(await http.MultipartFile.fromPath(
-            'registarion_card', rcImage!.path));
-      }
-      if (drivingImage != null) {
-        request.files.add(await http.MultipartFile.fromPath(
-            'driving_license', drivingImage!.path));
-      }
-    }
-
-    ///Event
-    if (type == "5") {
-      request.fields.addAll({
-        'city_id': '${categoryValue.toString()}',
-       // 'company_name': roleUser ? '${companyController.text.toString()}' :'freelancer',
-        'categories_id': '${selectCatItems.toString()}',
-        //'gst_no' :  '${gstController.text.toString()}',
-        //'role_user': roleUser ? 'company' : 'freelancer' ,
-        'gender': '$gender'
-      });
-    }
-
-    if (type == "6") {
-      request.fields.addAll({
-        'city_id': '${categoryValue.toString()}',
-        //'company_name': roleUser ? '${companyController.text.toString()}' :'freelancer',
-        'categories_id': '${selectCatItems.toString()}',
-        //'gst_no' :  '${gstController.text.toString()}',
-        'role_user': roleUser ? 'company' : 'freelancer' ,
-      });
-    }
-    ///pandit ji
-    if (type == "7") {
-      request.fields.addAll({
-        'city_id': '${categoryValue.toString()}',
-       // 'company_name': roleUser ? '${companyController.text.toString()}' :'freelancer',
-        'categories_id': '${selectCatItems.toString()}',
-       // 'gst_no' : '${gstController.text.toString()}',
-       // 'role_user': roleUser ? 'company' : 'freelancer' ,
-      });
-    }
-    /// tent house
-    if(type == "8"){
-      request.fields.addAll({
-        'store_name': '${storeNameController.text.toString()}',
-        'fssai': '${fssaiController.text.toString()}',
-        'gst_no': '${gstController.text.toString()}',
-        'categories_id': '${selectCatItems.toString()}',
-        'store_description': '${storeDescriptionController.text.toString()}',
-
-      });
-    }
     if (aadharImage != null) {
       request.files.add(
           await http.MultipartFile.fromPath('adhar_card', aadharImage!.path));
     }
+    if (aadharBack != null) {
+      request.files.add(
+          await http.MultipartFile.fromPath('adhar_back', aadharBack!.path));
+    }
+    if (profileImage != null) {
+      request.files.add(
+          await http.MultipartFile.fromPath('profile_image', profileImage!.path));
+    }
     if (panImage != null) {
-      request.files
-          .add(await http.MultipartFile.fromPath('pancard', panImage!.path));
+      request.files.add(await http.MultipartFile.fromPath('pancard', panImage!.path));
+    }
+    if (catalogImage != null) {
+      request.files.add(
+          await http.MultipartFile.fromPath('pdf_upload', catalogImage!.path));
     }
 
-    print("ok++++++++======>>>>${request.fields} ${request.files}");
-    request.headers.addAll(headers);
+    // String delType = '';
+    // if(deliveryTypeValue == "Delivery Only") {
+    //   setState(() {
+    //     delType = 'delivery_only';
+    //   });
+    // } else if(deliveryTypeValue == "Ride Only") {
+    //   setState(() {
+    //     delType = 'ride_only';
+    //   });
+    // } else {
+    //   setState(() {
+    //     delType = 'both';
+    //   });
+    // }
 
+    // ///2wheeler
+    // if (type == "2" || type == "3" || type == "4") {
+    //   request.fields.addAll({
+    //     'vehicle_no': '${vehicleController.text.toString()}',
+    //     'city_id': '${categoryValue.toString()}',
+    //     'delivery_type' : '${delType.toString()}'
+    //   });
+    //   if (rcImage != null) {
+    //     request.files.add(await http.MultipartFile.fromPath(
+    //         'registarion_card', rcImage!.path));
+    //   }
+    //   if (drivingImage != null) {
+    //     request.files.add(await http.MultipartFile.fromPath(
+    //         'driving_license', drivingImage!.path));
+    //   }
+    // }
+    //
+    // ///Event
+    // if (type == "5") {
+    //   request.fields.addAll({
+    //     'city_id': '${categoryValue.toString()}',
+    //     'categories_id': '${selectCatItems.toString()}',
+    //     //'gst_no' :  '${gstController.text.toString()}',
+    //     //'role_user': roleUser ? 'company' : 'freelancer' ,
+    //     'gender': '$gender'
+    //   });
+    // }
+    //
+    // if (type == "6") {
+    //   request.fields.addAll({
+    //     'city_id': '${categoryValue.toString()}',
+    //     'categories_id': '${selectCatItems.toString()}',
+    //     //'gst_no' :  '${gstController.text.toString()}',
+    //     'role_user': roleUser ? 'company' : 'freelancer' ,
+    //   });
+    // }
+    //
+    // ///pandit ji
+    // if (type == "7") {
+    //   request.fields.addAll({
+    //     'city_id': '${categoryValue.toString()}',
+    //     'categories_id': '${selectCatItems.toString()}',
+    //    // 'gst_no' : '${gstController.text.toString()}',
+    //    // 'role_user': roleUser ? 'company' : 'freelancer' ,
+    //   });
+    // }
+    //
+    // /// tent house
+    // if(type == "8"){
+    //   request.fields.addAll({
+    //     'store_name': '${storeNameController.text.toString()}',
+    //     'fssai': '${fssaiController.text.toString()}',
+    //     'gst_no': '${gstController.text.toString()}',
+    //     'categories_id': '${selectCatItems.toString()}',
+    //     'store_description': '${storeDescriptionController.text.toString()}',
+    //   });
+    // }
+
+    print("ok++++++++======>>>> ${request.fields} ${request.files}");
+    request.headers.addAll(headers);
     var response = await request.send();
     String str = await response.stream.bytesToString();
     if (response.statusCode == 200) {
       print("this is respoinse @@ ${response.statusCode}");
-      // _showMyDialog();
-      // final jsonResponse = ServiceRequestModel.fromJson(json.decode(finalResult));
-      // print("checking json response ${jsonResponse.msg} and ${jsonResponse.responseCode}");
-      // if(finalResult.responseCode == "0"){
-      // }
-      // else{
       var result = json.decode(str);
       final jsonResponse = RegistrationModel.fromJson(result);
-      if(jsonResponse.responseCode == "1") {
-        setState((){
+      if(jsonResponse.status == true) {
+        setState(() {
           isLoading = false;
         });
         Fluttertoast.showToast(msg: "${jsonResponse.message}");
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => Login()
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Login()
               //BottomBar()
             ));
-      }else{
+      } else {
         setState((){
           isLoading = false;
         });
         Fluttertoast.showToast(msg: "${jsonResponse.message}");
       }
-      // }
-
     } else {
       Fluttertoast.showToast(msg: "Error during communication : server error");
       print(response.reasonPhrase);
     }
   }
 
-  Future<void> _showMyDialog() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: const <Widget>[
-                Text(
-                  'User details sent successfully',
-                  style: TextStyle(fontSize: 16),
-                ),
-                Text(
-                  'Waiting for admin approval',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                // Navigator.push(
-                //     context, MaterialPageRoute(builder: (context) => Login()));
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-  void requestPermission(BuildContext context,int i) async{
+  void requestPermission(BuildContext context,int i) async {
     var status = await Permission.storage.request();
-    if(status.isGranted){
-      getImage(ImgSource.Both, context,i);
+    if(status.isGranted) {
+      // pickImage(ImageSource.Both, context, i);
     } else if(status.isPermanentlyDenied){
       openAppSettings();
     }
+
 //     if (await Permission.camera.isRestricted || await Permission.storage.isRestricted) {
 //       openAppSettings();
 //     }
@@ -781,61 +863,97 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
 //         }
 //       }
 //     }
-
   }
   // File? _image,_finalImage,panImage,vehicleImage,adharImage,insuranceImage,bankImage;
 
-  Future getImage(ImgSource source, BuildContext context,int i) async {
-    var image = await ImagePickerGC.pickImage(
-      context: context,
+  // Future getImage(ImgSource source, BuildContext context,int i) async {
+  //   var image = await ImagePickerGC.pickImage(
+  //     context: context,
+  //     source: source,
+  //     cameraIcon: Icon(
+  //       Icons.add,
+  //       color: Colors.red,
+  //     ), //cameraIcon and galleryIcon can change. If no icon provided default icon will be present
+  //   );
+  //   getCropImage(context, i, image);
+  // }
+  // void getCropImage(BuildContext context,int i,var image) async {
+  //   CroppedFile? croppedFile = await ImageCropper.platform.cropImage(
+  //       sourcePath: image.path,
+  //       aspectRatioPresets: [
+  //         CropAspectRatioPreset.square,
+  //         CropAspectRatioPreset.ratio3x2,
+  //         CropAspectRatioPreset.original,
+  //         CropAspectRatioPreset.ratio4x3,
+  //         CropAspectRatioPreset.ratio16x9
+  //       ],
+  //       // androidUiSettings: AndroidUiSettings(
+  //       //     toolbarTitle: 'Cropper',
+  //       //     toolbarColor: Colors.lightBlueAccent,
+  //       //     toolbarWidgetColor: Colors.white,
+  //       //     initAspectRatio: CropAspectRatioPreset.original,
+  //       //     lockAspectRatio: false),
+  //       // iosUiSettings: IOSUiSettings(
+  //       //   minimumAspectRatio: 1.0,
+  //       // )
+  //   );
+  //   setState(() {
+  //     if(i==1){
+  //       aadharImage = File(croppedFile!.path);
+  //     }else  if(i==2) {
+  //       panImage = File(croppedFile!.path);
+  //     }else  if(i==4) {
+  //       drivingImage = File(croppedFile!.path);
+  //     }else if(i==3) {
+  //       rcImage = File(croppedFile!.path);
+  //     }
+  //     else if(i==5) {
+  //       aadharBack = File(croppedFile!.path);
+  //     }
+  //     else if(i==6) {
+  //       profileImage = File(croppedFile!.path);
+  //     }
+  //     else if(i==7) {
+  //       catalogImage = File(croppedFile!.path);
+  //     }
+  //     // else if(i==6){
+  //     //   insuranceImage = File(croppedFile!.path);
+  //     // }
+  //     // else if(i==7){
+  //     //   bankImage = File(croppedFile!.path);
+  //     // }
+  //     // else{
+  //     //   _finalImage = File(croppedFile!.path);
+  //     // }
+  //   });
+  // }
+
+  Future<void> pickImage(ImageSource source, String type) async {
+    final pickedFile = await ImagePicker().pickImage(
       source: source,
-      cameraIcon: Icon(
-        Icons.add,
-        color: Colors.red,
-      ), //cameraIcon and galleryIcon can change. If no icon provided default icon will be present
+      maxHeight: 100,
+      maxWidth: 100,
+      imageQuality: 50,
     );
-    getCropImage(context, i, image);
-  }
-  void getCropImage(BuildContext context,int i,var image) async {
-    CroppedFile? croppedFile = await ImageCropper.platform.cropImage(
-        sourcePath: image.path,
-        aspectRatioPresets: [
-          CropAspectRatioPreset.square,
-          CropAspectRatioPreset.ratio3x2,
-          CropAspectRatioPreset.original,
-          CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio16x9
-        ],
-        // androidUiSettings: AndroidUiSettings(
-        //     toolbarTitle: 'Cropper',
-        //     toolbarColor: Colors.lightBlueAccent,
-        //     toolbarWidgetColor: Colors.white,
-        //     initAspectRatio: CropAspectRatioPreset.original,
-        //     lockAspectRatio: false),
-        // iosUiSettings: IOSUiSettings(
-        //   minimumAspectRatio: 1.0,
-        // )
-    );
-    setState(() {
-      if(i==1){
-        aadharImage = File(croppedFile!.path);
-      }else  if(i==2){
-        panImage = File(croppedFile!.path);
-      }else  if(i==4){
-        drivingImage = File(croppedFile!.path);
-      }else if(i==3){
-        rcImage = File(croppedFile!.path);
-      }
-      // else if(i==6){
-      //   insuranceImage = File(croppedFile!.path);
-      // }
-      // else if(i==7){
-      //   bankImage = File(croppedFile!.path);
-      // }
-      // else{
-      //   _finalImage = File(croppedFile!.path);
-      // }
-    });
+    if (pickedFile != null) {
+      setState(() {
+        if (type == 'catalogImage') {
+          catalogImage = File(pickedFile.path);
+        }
+        else if (type == 'profileImage') {
+          profileImage = File(pickedFile.path);
+        }
+        else if (type == 'aadharImage') {
+          aadharImage = File(pickedFile.path);
+        }
+        else if (type == 'aadharBackImage') {
+          aadharBack = File(pickedFile.path);
+        }
+        else if (type == 'pancard') {
+           panImage = File(pickedFile.path);
+        }
+      });
+    }
   }
 
   manageRole() {
@@ -854,10 +972,10 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
         type = "6";
         appBarTitle = "Photographer";
       });
-    } else if (widget.role == "Pandit Ji") {
+    } else if (widget.role == "Purohit") {
       setState(() {
         type = "7";
-        appBarTitle = "Pandit JI";
+        appBarTitle = "Purohit";
       });
     } else if (widget.role == "Tent House") {
       setState(() {
@@ -879,6 +997,7 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
   }
 
   List<CityData> cityList = [];
+  List<StataData> stateList = [];
   List<Categories> eventCat = [];
 
   List accountType = [
@@ -887,6 +1006,7 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
   ];
   double? pickLat;
   double? pickLong;
+
   // _getPickLocation() async {
   //   LocationResult result = await Navigator.of(context).push(MaterialPageRoute(
   //       builder: (context) => PlacePicker(
@@ -908,28 +1028,46 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
   //   print("this is picked LAT LONG $pickLat @@ $pickLong");
   // }
 
-  _getCities() async {
+
+  _getState() async {
+    var uri = Uri.parse('${Apipath.getStateUrl}');
+    var request = new http.MultipartRequest("POST", uri);
+    Map<String, String> headers = {
+      "Accept": "application/json",
+    };
+
+    request.headers.addAll(headers);
+    var response = await request.send();
+    print(response.statusCode);
+    String responseData = await response.stream.transform(utf8.decoder).join();
+    var userData = json.decode(responseData);
+    if (mounted) {
+      setState(() {
+        stateList = StateModel.fromJson(userData).data!;
+      });
+    }
+    print(responseData);
+  }
+
+  _getCities(String? sId,) async {
     var uri = Uri.parse('${Apipath.getCitiesUrl}');
-    var request = new http.MultipartRequest("GET", uri);
+    var request = new http.MultipartRequest("POST", uri);
     Map<String, String> headers = {
       "Accept": "application/json",
     };
     // print(baseUrl.toString());
 
     request.headers.addAll(headers);
-    // request.fields['type_id'] = "1";
+    request.fields['state_id'] = sId.toString();
+    print("ppppppppppppppppppppp ${request.fields}");
     // request.fields['vendor_id'] = userID;
     var response = await request.send();
     print(response.statusCode);
     String responseData = await response.stream.transform(utf8.decoder).join();
     var userData = json.decode(responseData);
-
     if (mounted) {
       setState(() {
-        // collectionModal = AllCateModel.fromJson(userData);
-        cityList = CitiesModel.fromJson(userData).data!;
-        // print(
-        //     "ooooo ${collectionModal!.status} and ${collectionModal!.categories!.length} and ${userID}");
+        cityList = CityModel.fromJson(userData).data!;
       });
     }
     print(responseData);
@@ -941,15 +1079,12 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
     Map<String, String> headers = {
       "Accept": "application/json",
     };
-    // print(baseUrl.toString());
-
     request.headers.addAll(headers);
     request.fields['type_id'] = "${type.toString()}";
     var response = await request.send();
     print(response.statusCode);
     String responseData = await response.stream.transform(utf8.decoder).join();
     var userData = json.decode(responseData);
-
     if (mounted) {
       setState(() {
         // collectionModal = AllCateModel.fromJson(userData);
@@ -987,7 +1122,7 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
     super.initState();
     getToken();
     manageRole();
-    _getCities();
+    _getState();
     _getEventCategory();
     getLocation();
      // getLocation();
@@ -1012,6 +1147,7 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
     'Events',
     'Parties'
   ];
+
   var deliveryType = [
     'Ride Only',
     'Delivery Only',
@@ -1112,9 +1248,7 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
                     );
                   }).toList(),
                 ),
-
-              )
-
+              ),
             // DropdownButtonHideUnderline(
             //   child: DropdownButton(
             //     // isExpanded: true,
@@ -1138,13 +1272,228 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
           ),
         )
         : SizedBox.shrink(),
+        //  type == "6" || type == "7" ?
+        Padding(
+          padding: const EdgeInsets.only(left: 10, bottom: 10),
+          child: Text("I Wan't to provide services",
+            style: TextStyle(
+                color: AppColor().colorBg1()
+            ),
+          ),
+        ),    // : SizedBox.shrink(),
+        //   type == "6" || type == "7"
+        //?
+        InkWell(
+          onTap: () {
+            _showMultiSelect();
+          },
+          child: Container(
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.only(left: 10),
+              decoration: BoxDecoration(
+                  color: AppColor().colorBg1(),
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.black.withOpacity(0.7))),
+              child: _selectedItems.isEmpty ?
+              Padding(
+                padding: const EdgeInsets.only(left: 10, top: 20, bottom: 20),
+                child: Text(
+                  'Services',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: colors.primary,
+                    fontWeight: FontWeight.normal,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ) :
+              Wrap(
+                children: _selectedItems
+                    .map((item){
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8),
+                    child: Chip(
+                      backgroundColor: AppColor().colorPrimary(),
+                      label:
+                      Text(
+                        "${item.cName}",
+                        style: TextStyle(
+                            color: AppColor().colorBg1()
+                        ),
+                        //item.name
+                      ),
+                    ),
+                  );
+                }).toList(),
+              )
+            // FutureBuilder(
+            //     future: getCities(),
+            //     builder: (BuildContext context,
+            //         AsyncSnapshot snapshot) {
+            //       if (snapshot.hasData) {
+            //         return DropdownButtonHideUnderline(
+            //           child: DropdownButton2(
+            //             isExpanded: true,
+            //             hint: Row(
+            //               children: [
+            //                 Image.asset(
+            //                   city,
+            //                   width: 6.04.w,
+            //                   height: 5.04.w,
+            //                   fit: BoxFit.fill,
+            //                   color: AppColor.PrimaryDark,
+            //                 ),
+            //                 SizedBox(
+            //                   width: 4,
+            //                 ),
+            //                 Expanded(
+            //                   child: Text(
+            //                     'Select Multiple Cities',
+            //                     style: TextStyle(
+            //                       fontSize: 14,
+            //                       fontWeight: FontWeight.normal,
+            //                     ),
+            //                     overflow: TextOverflow.ellipsis,
+            //                   ),
+            //                 ),
+            //               ],
+            //             ),
+            //             items: cityList.map((item) {
+            //               return DropdownMenuItem<String>(
+            //                 value: item.id,
+            //                 enabled: false,
+            //                 child: StatefulBuilder(
+            //                   builder: (context, menuSetState) {
+            //                     final _isSelected =
+            //                         selectedCities
+            //                             .contains(item);
+            //                     print("SLECTED CITY");
+            //                     return InkWell(
+            //                       onTap: () {
+            //                         _isSelected
+            //                             ? selectedCities
+            //                                 .remove(item.id)
+            //                             : selectedCities
+            //                                 .add(item.id!);
+            //                         setState(() {});
+            //                         menuSetState(() {});
+            //                       },
+            //                       child: Container(
+            //                         height: double.infinity,
+            //                         padding: const EdgeInsets
+            //                                 .symmetric(
+            //                             horizontal: 16.0),
+            //                         child: Row(
+            //                           children: [
+            //                             _isSelected
+            //                                 ? const Icon(Icons
+            //                                     .check_box_outlined)
+            //                                 : const Icon(Icons
+            //                                     .check_box_outline_blank),
+            //                             const SizedBox(
+            //                                 width: 16),
+            //                             Text(
+            //                               item.name!,
+            //                               style:
+            //                                   const TextStyle(
+            //                                 fontSize: 14,
+            //                               ),
+            //                             ),
+            //                           ],
+            //                         ),
+            //                       ),
+            //                     );
+            //                   },
+            //                 ),
+            //               );
+            //             }).toList(),
+            //             //Use last selected item as the current value so if we've limited menu height, it scroll to last item.
+            //             value: selectedCities.isEmpty
+            //                 ? null
+            //                 : selectedCities.last,
+            //             onChanged: (value) {},
+            //             buttonHeight: 50,
+            //             buttonWidth: 160,
+            //             buttonPadding: const EdgeInsets.only(
+            //                 left: 14, right: 14),
+            //             buttonDecoration: BoxDecoration(
+            //               borderRadius:
+            //                   BorderRadius.circular(14),
+            //               color: Color(0xffF9F9F9),
+            //             ),
+            //             buttonElevation: 0,
+            //             itemHeight: 40,
+            //             itemPadding: const EdgeInsets.only(
+            //                 left: 14, right: 14),
+            //             dropdownMaxHeight: 300,
+            //             dropdownPadding: null,
+            //             dropdownDecoration: BoxDecoration(
+            //               borderRadius:
+            //                   BorderRadius.circular(14),
+            //             ),
+            //             dropdownElevation: 8,
+            //             scrollbarRadius:
+            //                 const Radius.circular(40),
+            //             scrollbarThickness: 6,
+            //             scrollbarAlwaysShow: true,
+            //             selectedItemBuilder: (context) {
+            //               return cityList.map(
+            //                 (item) {
+            //                   return Container(
+            //                     // alignment: AlignmentDirectional.center,
+            //                     padding:
+            //                         const EdgeInsets.symmetric(
+            //                             horizontal: 16.0),
+            //                     child: Text(
+            //                       selectedCities.join(','),
+            //                       style: const TextStyle(
+            //                         fontSize: 14,
+            //                         overflow:
+            //                             TextOverflow.ellipsis,
+            //                       ),
+            //                       maxLines: 1,
+            //                     ),
+            //                   );
+            //                 },
+            //               ).toList();
+            //             },
+            //           ),
+            //         );
+            //       } else if (snapshot.hasError) {
+            //         return Icon(Icons.error_outline);
+            //       } else {
+            //         return Center(
+            //             child: CircularProgressIndicator());
+            //       }
+            //     })
+          ),
+        ),
+        SizedBox(height: 5),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(
+                  left: 5.0, top: 5, bottom: 10),
+              child: Text(
+                "Key Catalog Services",
+                style: TextStyle(
+                    fontSize: 15,
+                    color: AppColor().colorBg1()
+                ),
+              ),
+            ),
+           // pickImage(ImageSource.gallery, type);
+            imageCatalog(),
+          ],
+        ),
         Padding(
           padding: EdgeInsets.only(left: 10,top: 20, bottom: 0),
           child: Text('Name', style: TextStyle(
             color: Colors.white
-          ),),
+          ),
         ),
-
+        ),
         SizedBox(
           height: 10,
         ),
@@ -1152,7 +1501,8 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: AppColor().colorSecondary())
+            border: Border.all(color: AppColor().colorSecondary(),
+          ),
           ),
           // height: 50,
           child: TextFormField(
@@ -1170,7 +1520,8 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
                   //     color: Colors.white
                   //   ),
                   //     borderRadius: BorderRadius.circular(15))
-    )),
+          ),
+          ),
         ),
         const SizedBox(
           height: 10,
@@ -1182,7 +1533,8 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
           child: Text('Mobile No.',
           style: TextStyle(
             color: Colors.white
-          ),),
+          ),
+          ),
         ),
         SizedBox(
           height: 10,
@@ -1193,10 +1545,9 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
               borderRadius: BorderRadius.circular(15),
               border: Border.all(color: AppColor().colorSecondary())
           ),
-          // height: 50,
           child: TextFormField(
               controller: mobileController,
-              maxLength: 10  ,
+              maxLength: 10,
               keyboardType: TextInputType.phone,
               validator: (msg) {
                 if (msg!.isEmpty && msg.length != 10) {
@@ -1207,9 +1558,8 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
                 contentPadding: EdgeInsets.only(left: 10),
                   counterText: "",
                   border: InputBorder.none
-                  // OutlineInputBorder(
-                  //     borderRadius: BorderRadius.circular(15))
-              )),
+              ),
+          ),
         ),
         SizedBox(
           height: 10,
@@ -1218,7 +1568,8 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
           padding: const EdgeInsets.only(left: 10),
           child: Text('Email Id', style: TextStyle(
             color: Colors.white
-          ),),
+          ),
+          ),
         ),
         SizedBox(
           height: 10,
@@ -1232,568 +1583,21 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
           // height: 50,
           child: TextFormField(
               controller: emailController,
-              validator: (msg) {
-                if (msg!.isEmpty) {
-                  return "Please Enter Email Id";
-                }
-              },
+              // validator: (msg) {
+              //   if (msg!.isEmpty) {
+              //     return "Please Enter Email Id";
+              //   }
+              // },
+             validator: FormValidation.emailVeledetion,
               decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 10 ),
-                  border: InputBorder.none
-                  // OutlineInputBorder(
-                  //     borderRadius: BorderRadius.circular(15))
-              )),
+                contentPadding: EdgeInsets.only(left: 10),
+                  border: InputBorder.none,
+              ),
+          ),
         ),
         const SizedBox(
           height: 10,
         ),
-        type == "5" ?
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Radio(
-                    value: 1,
-                    fillColor: MaterialStateColor.resolveWith((states) => AppColor().colorBg1()),
-                    groupValue: _value3,
-                    onChanged: (int? value) {
-                      setState(() {
-                        _value3 = value!;
-                        gender = 'male';
-                        // isUpi = false;
-                      });
-                    }),
-                Text(
-                  "Male",
-                  style: TextStyle(color: AppColor().colorBg1()),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Radio(
-                    value: 2,
-                    fillColor: MaterialStateColor.resolveWith((states) => AppColor().colorBg1()),
-                    groupValue: _value3,
-                    onChanged: (int? value) {
-                      setState(() {
-                        _value3 = value!;
-                        gender = 'female';
-                      });
-                    }),
-                Text(
-                  "Female",
-                  style: TextStyle(color: AppColor().colorBg1()),
-                ),
-              ],
-            ),
-          ],
-        )
-            : SizedBox.shrink(),
-        Padding(
-          padding: const EdgeInsets.only(left: 10),
-          child: Text('Password',
-          style: TextStyle(
-            color: AppColor().colorBg1()
-          ),),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Container(
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: AppColor().colorSecondary())
-          ),
-          // height: 50,
-          child: TextFormField(
-            obscureText: pass,
-              controller: passwordController,
-              validator: (msg) {
-                if (msg!.isEmpty) {
-                  return "Please Enter Password ";
-                }
-              },
-              decoration: InputDecoration(
-                  contentPadding: EdgeInsets.only(left: 10, top: 10 ),
-                  suffixIcon: IconButton(
-                      onPressed: (){
-                        setState((){
-                          pass = !pass;
-                        });
-                      },
-                      icon: pass ? Icon(Icons.visibility,
-                        color: AppColor.PrimaryDark,)
-                          : Icon(Icons.visibility_off,)),
-                  border: InputBorder.none
-              )),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 10),
-          child: Text('Confirm password',
-          style: TextStyle(
-            color: AppColor().colorBg1()
-          ),),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Container(
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: AppColor().colorSecondary())
-          ),
-          // height: 50,
-          child: TextFormField(
-            obscureText: cPass,
-              controller: confirmPassController,
-              validator: (msg) {
-                if (msg!.isEmpty) {
-                  return "Please Enter Confirm Password ";
-                }
-              },
-              decoration: InputDecoration(
-                  contentPadding: EdgeInsets.only(left: 10, top: 10),
-                suffixIcon: IconButton(
-                  onPressed: (){
-                    setState((){
-                      cPass = !cPass;
-                    });
-                  },
-                    icon: cPass ? Icon(Icons.visibility,
-                    color: AppColor.PrimaryDark,)
-                : Icon(Icons.visibility_off,)),
-                  border: InputBorder.none
-              )),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 10),
-          child: Text('Address',
-          style: TextStyle(
-            color: AppColor().colorBg1()
-          ),),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        InkWell(
-          onTap: () {
-            // _getPickLocation();
-          },
-          child: Container(
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: AppColor().colorSecondary())
-            ),
-            // height: 60,
-            child: TextFormField(
-                maxLines: 1,
-                controller: addressController,
-                validator: (msg) {
-                  if (msg!.isEmpty) {
-                    return "Please Enter Address ";
-                  }
-                },
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PlacePicker(
-                        apiKey: Platform.isAndroid
-                            ? "AIzaSyBmUCtQ_DlYKSU_BV7JdiyoOu1i4ybe-z0"
-                            : "AIzaSyBmUCtQ_DlYKSU_BV7JdiyoOu1i4ybe-z0",
-                        onPlacePicked: (result) {
-                          print(result.formattedAddress);
-                          setState(() {
-                            addressController.text =
-                                result.formattedAddress.toString();
-                            pickLat =
-                                result.geometry!.location.lat;
-                            pickLong =
-                                result.geometry!.location.lng;
-                          });
-                          Navigator.of(context).pop();
-                        },
-                        initialPosition: LatLng(22.719568,75.857727
-                          // double.parse(widget.lat.toString()), double.parse(widget.long.toString())
-                        ),
-                        useCurrentLocation: true,
-                      ),
-                    ),
-                  );
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => PlacePicker(
-                  //       apiKey: Platform.isAndroid
-                  //           ? "AIzaSyBxsWdUSLMXzjxD6X-IOKjZMp3aMoxJfKc"
-                  //           : "AIzaSyBxsWdUSLMXzjxD6X-IOKjZMp3aMoxJfKc",
-                  //       onPlacePicked: (result) {
-                  //         print(result.formattedAddress);
-                  //         setState(() {
-                  //           addressController.text =
-                  //               result.formattedAddress.toString();
-                  //           pickLat =
-                  //               result.geometry!.location.lat;
-                  //           pickLong =
-                  //               result.geometry!.location.lng;
-                  //         });
-                  //         Navigator.of(context).pop();
-                  //       },
-                  //       initialPosition: LatLng(22.719568,75.857727
-                  //           // double.parse(widget.lat.toString()), double.parse(widget.long.toString())
-                  //   ),
-                  //       useCurrentLocation: true,
-                  //     ),
-                  //   ),
-                  // );
-                  // _getPickLocation();
-                },
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.only(left: 10),
-                    border: InputBorder.none
-                )
-              // decoration: InputDecoration(
-              //   border: OutlineInputBorder(),
-              // ),
-            ),
-          ),
-        ),
-        SizedBox(height: 10),
-      type == "6" || type == "7" ? SizedBox.shrink() : Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Radio(
-                    value: 1,
-                    fillColor: MaterialStateColor.resolveWith((states) => AppColor().colorBg1()),
-                    groupValue: _value,
-                    onChanged: (int? value) {
-                      setState(() {
-                        _value = value!;
-                        isUpi = false;
-                      });
-                    }),
-                Text(
-                  "Bank Upi",
-                  style: TextStyle(color: AppColor().colorBg1()),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Radio(
-                    value: 2,
-                    fillColor: MaterialStateColor.resolveWith((states) => AppColor().colorBg1()),
-                    groupValue: _value,
-                    onChanged: (int? value) {
-                      setState(() {
-                        _value = value!;
-                        isUpi = true;
-                      });
-                    }),
-                Text(
-                  "Bank Account",
-                  style: TextStyle(color: AppColor().colorBg1()),
-                ),
-              ],
-            ),
-          ],
-        ),
-      type == "6" || type == "7" ? SizedBox.shrink() :  isUpi == false
-            ? Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Text('UPI Id', style: TextStyle(
-                color: AppColor().colorBg1()
-              ),),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: AppColor().colorSecondary())
-              ),
-              // height: 50,
-              child: TextFormField(
-                  controller: upiController,
-                  validator: (msg) {
-                    if (msg!.isEmpty) {
-                      return "Please Enter UPI Id ";
-                    }
-                  },
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.only(left: 10),
-                      border: InputBorder.none
-                  )
-                // decoration: InputDecoration(
-                //   border: OutlineInputBorder(),
-                // ),
-              ),
-            ),
-          ],
-        )
-            : SizedBox.shrink(),
-        isUpi == true
-            ? Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Text('Account Holder Name',style: TextStyle(
-                  color: AppColor().colorBg1()
-              ),),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: AppColor().colorSecondary())
-              ),
-              // height: 50,
-              child: TextFormField(
-                  controller: accountHolderController,
-                  // validator: (msg) {
-                  //   if (msg!.isEmpty) {
-                  //     return "Please Enter Account Holder Name ";
-                  //   }
-                  // },
-                  decoration: InputDecoration(
-                      contentPadding: EdgeInsets.only(left: 10 ),
-                      border: InputBorder.none
-                      // OutlineInputBorder(
-                      //     borderRadius: BorderRadius.circular(15))
-                  )
-                // decoration: InputDecoration(
-                //   border: OutlineInputBorder(),
-                // ),
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Text('Account Number',
-                style: TextStyle(
-                    color: AppColor().colorBg1()
-                ),),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: AppColor().colorSecondary())
-              ),
-              // height: 50,
-              child: TextFormField(
-                  controller: accountNoController,
-                  keyboardType: TextInputType.number,
-                  validator: (msg) {
-                    if (msg!.isEmpty) {
-                      return "Please Enter Account Number";
-                    }
-                  },
-                  decoration: InputDecoration(
-                      contentPadding: EdgeInsets.only(left: 10 ),
-                    counterText: "",
-                      border: InputBorder.none
-                  )
-                // decoration: InputDecoration(
-                //   border: OutlineInputBorder(),
-                // ),
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Text('Confirm Account Number',style: TextStyle(
-                  color: AppColor().colorBg1()
-              ),),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: AppColor().colorSecondary())
-              ),
-              // height: 50,
-              child: TextFormField(
-                  controller: confmAccountNumController,
-                  keyboardType: TextInputType.number,
-                  // validator: (msg) {
-                  // if(msg != confmAccountNumController.text){
-                  //   return "Account number and confirm account number must be same";
-                  // }
-                  // },
-                  decoration: InputDecoration(
-                      contentPadding: EdgeInsets.only(left: 10 ),
-                      counterText: "",
-                      border: InputBorder.none
-                  )
-                // decoration: InputDecoration(
-                //   border: OutlineInputBorder(),
-                // ),
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Text('Bank Name',style: TextStyle(
-                  color: AppColor().colorBg1()
-              ),),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: AppColor().colorSecondary())
-              ),
-              // height: 50,
-              child: TextFormField(
-                  controller: bankNameController,
-                  // validator: (msg) {
-                  //   if (msg!.isEmpty) {
-                  //     return "Please Enter Bank Name ";
-                  //   }
-                  // },
-                  decoration: InputDecoration(
-                      contentPadding: EdgeInsets.only(left: 10),
-                      border: InputBorder.none
-                  )
-                // decoration: InputDecoration(
-                //   border: OutlineInputBorder(),
-                // ),
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Text('IFSC Code',style: TextStyle(
-                  color: AppColor().colorBg1()
-              ),),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              // height: 50,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: AppColor().colorSecondary())
-              ),
-              child: TextFormField(
-                  controller: ifscController,
-                  // validator: (msg) {
-                  //   if (msg!.isEmpty) {
-                  //     return "Please Enter IFSC Code";
-                  //   }
-                  // },
-                  decoration: InputDecoration(
-                      contentPadding: EdgeInsets.only(left: 10 ),
-                      border: InputBorder.none
-                  )
-                // decoration: InputDecoration(
-                //   border: OutlineInputBorder(),
-                // ),
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Text('Account Type',style: TextStyle(
-                  color: AppColor().colorBg1()
-              ),),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 5.0, bottom: 10),
-              child: Container(
-                height: 60,
-                padding: EdgeInsets.only(left: 10),
-                decoration: BoxDecoration(
-                  color: AppColor().colorBg1(),
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(
-                        color: AppColor().colorSecondary())),
-                child: DropdownButton(
-                  // Initial Value
-                  value: accTypeValue,
-                  underline: Container(),
-                  isExpanded: true,
-                  // Down Arrow Icon
-                  icon: Icon(Icons.keyboard_arrow_down, color: AppColor().colorPrimary(),),
-                  hint: Text("Select Account Type", style: TextStyle(
-                    color: AppColor().colorPrimary()
-                  ),),
-                  // Array list of items
-                  items: accountType.map((items) {
-                    return DropdownMenuItem(
-                      value: items,
-                      child: Container(
-                          child: Text(items.toString())),
-                    );
-                  }).toList(),
-                  // After selecting the desired option,it will
-                  // change button value to selected value
-                  onChanged: (newValue) {
-                    setState(() {
-                      accTypeValue = newValue!;
-                      print(
-                          "selected category ${accTypeValue.toString()}");
-                    });
-                  },
-                ),
-              ),
-            ),
-          ],
-        )
-            : SizedBox.shrink(),
         SizedBox(
           height: 10,
         ),
@@ -1815,7 +1619,7 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
           },
           icon: Icon(Icons.arrow_back_ios),
         ),
-        title: Text("${appBarTitle}"),
+        title: Text("$appBarTitle"),
       ),
       body: SingleChildScrollView(
         child: Form(
@@ -1844,274 +1648,291 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     commonFields(),
-                    type == "6" || type == "5" || type == "7"
-                        ? SizedBox.shrink()
-                        : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Text('GST No.',
-                          style: TextStyle(
-                            color: AppColor().colorBg1()
-                          ),),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: AppColor().colorSecondary())
-                          ),
-                          // height: 50,
-                          child: TextFormField(
-                              controller: gstController,
-                              // validator: (msg) {
-                              //   if (msg!.isEmpty) {
-                              //     return "Please Enter GST";
-                              //   }
-                              // },
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 10),
-                                  border: InputBorder.none)
-                            // decoration: InputDecoration(
-                            //   border: OutlineInputBorder(),
-                            // ),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                      ],
-                    ),
-                    // type == '1'?
-                    // Padding(
-                    //   padding: const EdgeInsets.only(top: 15.0, bottom: 15),
-                    //   child: Row(
-                    //     crossAxisAlignment: CrossAxisAlignment.center,
-                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //     children: [
-                    //       Row(
-                    //         mainAxisAlignment: MainAxisAlignment.center,
-                    //         children: [
-                    //           Radio(
-                    //               fillColor: MaterialStateColor.resolveWith((states) => AppColor().colorBg1()),
-                    //               value: 1,
-                    //               groupValue: _value2,
-                    //               onChanged: (int? value) {
-                    //                 setState(() {
-                    //                   _value2 = value!;
-                    //                   restroType = "Veg";
-                    //                   // roleUser = true;
-                    //                   // isUpi = false;
-                    //                 });
-                    //               }),
-                    //           Text("Veg", style: TextStyle(
-                    //             color: AppColor().colorBg1()
-                    //           ),),
-                    //           // Container(
-                    //           //   padding: EdgeInsets.all(10),
-                    //           //   // height: 40,
-                    //           //   decoration: BoxDecoration(
-                    //           //       color: AppColor().colorBg1(),
-                    //           //       borderRadius: BorderRadius.circular(10),
-                    //           //       border: Border.all(
-                    //           //           color: AppColor().colorPrimary())),
-                    //           //   child: Row(
-                    //           //     children: [
-                    //           //       Image.asset(
-                    //           //         'images/veg.png',
-                    //           //         height: 20,
-                    //           //         width: 20,
-                    //           //       ),
-                    //           //       SizedBox(
-                    //           //         width: 5,
-                    //           //       ),
-                    //           //       Text("Veg")
-                    //           //     ],
-                    //           //   ),
-                    //           // )
-                    //         ],
+                    // type == "6" || type == "5" || type == "7"
+                    //     ? SizedBox.shrink()
+                    //     : Column(
+                    //   crossAxisAlignment: CrossAxisAlignment.start,
+                    //   children: [
+                    //     Padding(
+                    //       padding: const EdgeInsets.only(left: 10),
+                    //       child: Text('GST No.',
+                    //       style: TextStyle(
+                    //         color: AppColor().colorBg1()
                     //       ),
-                    //       Row(
-                    //         mainAxisAlignment: MainAxisAlignment.center,
-                    //         children: [
-                    //           Radio(
-                    //               value: 2,
-                    //               fillColor: MaterialStateColor.resolveWith((states) => AppColor().colorBg1()),
-                    //               groupValue: _value2,
-                    //               onChanged: (int? value) {
-                    //                 setState(() {
-                    //                   _value2 = value!;
-                    //                   restroType = "Non-Veg";
-                    //                   // roleUser = false;
-                    //                   // isUpi = true;
-                    //                 });
-                    //               }),
-                    //           Text("Non-Veg",
-                    //                style: TextStyle(
-                    //               color: AppColor().colorBg1()
-                    // ),)
-                    //           // Container(
-                    //           //   padding: EdgeInsets.all(10),
-                    //           //   // height: 40,
-                    //           //   decoration: BoxDecoration(
-                    //           //       color: AppColor().colorBg1(),
-                    //           //       borderRadius: BorderRadius.circular(10),
-                    //           //       border: Border.all(
-                    //           //           color: AppColor().colorPrimary())),
-                    //           //   child: Row(
-                    //           //     children: [
-                    //           //       Image.asset(
-                    //           //         'images/nonveg.png',
-                    //           //         height: 20,
-                    //           //         width: 20,
-                    //           //       ),
-                    //           //       SizedBox(
-                    //           //         width: 5,
-                    //           //       ),
-                    //           //       Text("Non-Veg")
-                    //           //     ],
-                    //           //   ),
-                    //           // )
-                    //         ],
                     //       ),
-                    //       Row(
-                    //         mainAxisAlignment: MainAxisAlignment.center,
-                    //         children: [
-                    //           Radio(
-                    //               fillColor: MaterialStateColor.resolveWith((states) => AppColor().colorBg1()),
-                    //               value: 3,
-                    //               groupValue: _value2,
-                    //               onChanged: (int? value) {
-                    //                 setState(() {
-                    //                   _value2 = value!;
-                    //                   restroType = "both";
-                    //                   // roleUser = true;
-                    //                   // isUpi = false;
-                    //                 });
-                    //               }),
-                    //           Text("Both",style: TextStyle(
-                    //               color: AppColor().colorBg1() ),)
-                    //
-                    //           // Container(
-                    //           //   padding: EdgeInsets.all(10),
-                    //           //   // height: 40,
-                    //           //   decoration: BoxDecoration(
-                    //           //       color: AppColor().colorBg1(),
-                    //           //       borderRadius: BorderRadius.circular(10),
-                    //           //       border: Border.all(
-                    //           //           color: AppColor().colorPrimary())),
-                    //           //   child: Row(
-                    //           //     children: [
-                    //           //       // Image.asset(
-                    //           //       //   'images/veg.png',
-                    //           //       //   height: 20,
-                    //           //       //   width: 20,
-                    //           //       // ),
-                    //           //       SizedBox(
-                    //           //         width: 5,
-                    //           //       ),
-                    //           //       Text("Both")
-                    //           //     ],
-                    //           //   ),
-                    //           // )
-                    //         ],
+                    //     ),
+                    //     SizedBox(
+                    //       height: 10,
+                    //     ),
+                    //     Container(
+                    //       decoration: BoxDecoration(
+                    //           color: Colors.white,
+                    //           borderRadius: BorderRadius.circular(15),
+                    //           border: Border.all(color: AppColor().colorSecondary())
                     //       ),
-                    //     ],
-                    //   ),
+                    //       // height: 50,
+                    //       child: TextFormField(
+                    //           controller: gstController,
+                    //           // validator: (msg) {
+                    //           //   if (msg!.isEmpty) {
+                    //           //     return "Please Enter GST";
+                    //           //   }
+                    //           // },
+                    //           decoration: InputDecoration(
+                    //             contentPadding: EdgeInsets.only(left: 10),
+                    //               border: InputBorder.none)
+                    //         // decoration: InputDecoration(
+                    //         //   border: OutlineInputBorder(),
+                    //         // ),
+                    //       ),
+                    //     ),
+                    //     SizedBox(height: 10),
+                    //   ],
+                    // ),
+                    // // type == '1'?
+                    // // Padding(
+                    // //   padding: const EdgeInsets.only(top: 15.0, bottom: 15),
+                    // //   child: Row(
+                    // //     crossAxisAlignment: CrossAxisAlignment.center,
+                    // //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // //     children: [
+                    // //       Row(
+                    // //         mainAxisAlignment: MainAxisAlignment.center,
+                    // //         children: [
+                    // //           Radio(
+                    // //               fillColor: MaterialStateColor.resolveWith((states) => AppColor().colorBg1()),
+                    // //               value: 1,
+                    // //               groupValue: _value2,
+                    // //               onChanged: (int? value) {
+                    // //                 setState(() {
+                    // //                   _value2 = value!;
+                    // //                   restroType = "Veg";
+                    // //                   // roleUser = true;
+                    // //                   // isUpi = false;
+                    // //                 });
+                    // //               }),
+                    // //           Text("Veg", style: TextStyle(
+                    // //             color: AppColor().colorBg1()
+                    // //           ),),
+                    // //           // Container(
+                    // //           //   padding: EdgeInsets.all(10),
+                    // //           //   // height: 40,
+                    // //           //   decoration: BoxDecoration(
+                    // //           //       color: AppColor().colorBg1(),
+                    // //           //       borderRadius: BorderRadius.circular(10),
+                    // //           //       border: Border.all(
+                    // //           //           color: AppColor().colorPrimary())),
+                    // //           //   child: Row(
+                    // //           //     children: [
+                    // //           //       Image.asset(
+                    // //           //         'images/veg.png',
+                    // //           //         height: 20,
+                    // //           //         width: 20,
+                    // //           //       ),
+                    // //           //       SizedBox(
+                    // //           //         width: 5,
+                    // //           //       ),
+                    // //           //       Text("Veg")
+                    // //           //     ],
+                    // //           //   ),
+                    // //           // )
+                    // //         ],
+                    // //       ),
+                    // //       Row(
+                    // //         mainAxisAlignment: MainAxisAlignment.center,
+                    // //         children: [
+                    // //           Radio(
+                    // //               value: 2,
+                    // //               fillColor: MaterialStateColor.resolveWith((states) => AppColor().colorBg1()),
+                    // //               groupValue: _value2,
+                    // //               onChanged: (int? value) {
+                    // //                 setState(() {
+                    // //                   _value2 = value!;
+                    // //                   restroType = "Non-Veg";
+                    // //                   // roleUser = false;
+                    // //                   // isUpi = true;
+                    // //                 });
+                    // //               }),
+                    // //           Text("Non-Veg",
+                    // //                style: TextStyle(
+                    // //               color: AppColor().colorBg1()
+                    // // ),)
+                    // //           // Container(
+                    // //           //   padding: EdgeInsets.all(10),
+                    // //           //   // height: 40,
+                    // //           //   decoration: BoxDecoration(
+                    // //           //       color: AppColor().colorBg1(),
+                    // //           //       borderRadius: BorderRadius.circular(10),
+                    // //           //       border: Border.all(
+                    // //           //           color: AppColor().colorPrimary())),
+                    // //           //   child: Row(
+                    // //           //     children: [
+                    // //           //       Image.asset(
+                    // //           //         'images/nonveg.png',
+                    // //           //         height: 20,
+                    // //           //         width: 20,
+                    // //           //       ),
+                    // //           //       SizedBox(
+                    // //           //         width: 5,
+                    // //           //       ),
+                    // //           //       Text("Non-Veg")
+                    // //           //     ],
+                    // //           //   ),
+                    // //           // )
+                    // //         ],
+                    // //       ),
+                    // //       Row(
+                    // //         mainAxisAlignment: MainAxisAlignment.center,
+                    // //         children: [
+                    // //           Radio(
+                    // //               fillColor: MaterialStateColor.resolveWith((states) => AppColor().colorBg1()),
+                    // //               value: 3,
+                    // //               groupValue: _value2,
+                    // //               onChanged: (int? value) {
+                    // //                 setState(() {
+                    // //                   _value2 = value!;
+                    // //                   restroType = "both";
+                    // //                   // roleUser = true;
+                    // //                   // isUpi = false;
+                    // //                 });
+                    // //               }),
+                    // //           Text("Both",style: TextStyle(
+                    // //               color: AppColor().colorBg1() ),)
+                    // //
+                    // //           // Container(
+                    // //           //   padding: EdgeInsets.all(10),
+                    // //           //   // height: 40,
+                    // //           //   decoration: BoxDecoration(
+                    // //           //       color: AppColor().colorBg1(),
+                    // //           //       borderRadius: BorderRadius.circular(10),
+                    // //           //       border: Border.all(
+                    // //           //           color: AppColor().colorPrimary())),
+                    // //           //   child: Row(
+                    // //           //     children: [
+                    // //           //       // Image.asset(
+                    // //           //       //   'images/veg.png',
+                    // //           //       //   height: 20,
+                    // //           //       //   width: 20,
+                    // //           //       // ),
+                    // //           //       SizedBox(
+                    // //           //         width: 5,
+                    // //           //       ),
+                    // //           //       Text("Both")
+                    // //           //     ],
+                    // //           //   ),
+                    // //           // )
+                    // //         ],
+                    // //       ),
+                    // //     ],
+                    // //   ),
+                    // // )
+                    // // : SizedBox.shrink(),
+                    // roleUser ?
+                    // type == "6" || type == "5" || type == "8" || type == "7" || type == "1"
+                    //     ? SizedBox.shrink()
+                    //     : Column(
+                    //   crossAxisAlignment: CrossAxisAlignment.start,
+                    //   children: [
+                    //     Padding(
+                    //       padding: const EdgeInsets.only(left: 10.0),
+                    //       child: Text('Company Name',
+                    //       style: TextStyle(
+                    //         color: AppColor().colorBg1()
+                    //       ),),
+                    //     ),
+                    //     SizedBox(
+                    //       height: 10,
+                    //     ),
+                    //     Container(
+                    //       decoration: BoxDecoration(
+                    //           color: Colors.white,
+                    //           borderRadius: BorderRadius.circular(15),
+                    //           border: Border.all(color: AppColor().colorSecondary())
+                    //       ),
+                    //       // height: 50,
+                    //       child: TextFormField(
+                    //           controller: companyController,
+                    //           validator: (msg) {
+                    //             if (msg!.isEmpty) {
+                    //               return "Please Enter Company Name ";
+                    //             }
+                    //           },
+                    //           decoration: InputDecoration(
+                    //               border: InputBorder.none)
+                    //         // decoration: InputDecoration(
+                    //         //   border: OutlineInputBorder(),
+                    //         // ),
+                    //       ),
+                    //     ),
+                    //   ],
                     // )
-                    // : SizedBox.shrink(),
-                    roleUser ?
-                    type == "6" || type == "5" || type == "8" || type == "7" || type == "1"
-                        ? SizedBox.shrink()
-                        : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10.0),
-                          child: Text('Company Name',
-                          style: TextStyle(
-                            color: AppColor().colorBg1()
-                          ),),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: AppColor().colorSecondary())
-                          ),
-                          // height: 50,
-                          child: TextFormField(
-                              controller: companyController,
-                              validator: (msg) {
-                                if (msg!.isEmpty) {
-                                  return "Please Enter Company Name ";
-                                }
-                              },
-                              decoration: InputDecoration(
-                                  border: InputBorder.none)
-                            // decoration: InputDecoration(
-                            //   border: OutlineInputBorder(),
-                            // ),
-                          ),
-                        ),
-                      ],
-                    )
-                    :SizedBox.shrink(),
-                    SizedBox(height: 10),
-                    type == "2" || type == "3" || type == "4"
-                        ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Text('Vehicle No.',
-                          style: TextStyle(
-                            color: AppColor().colorBg1()
-                          ),),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: AppColor().colorSecondary())
-                          ),
-                          height: 50,
-                          child: TextFormField(
-                              controller: vehicleController,
-                              validator: (msg) {
-                                if (msg!.isEmpty) {
-                                  return "Please Enter Vehicle No.";
-                                }
-                              },
-                              decoration: InputDecoration(
-                                  border: InputBorder.none
-                                  // OutlineInputBorder(
-                                  //     borderRadius:
-                                  //     BorderRadius.circular(15))
-                              )
-                            // decoration: InputDecoration(
-                            //   border: OutlineInputBorder(),
-                            // ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                    )
-                        : SizedBox.shrink(),
-
+                    // :SizedBox.shrink(),
+                    // SizedBox(height: 10),
+                    // type == "2" || type == "3" || type == "4"
+                    //     ? Column(
+                    //   crossAxisAlignment: CrossAxisAlignment.start,
+                    //   children: [
+                    //     Padding(
+                    //       padding: const EdgeInsets.only(left: 10),
+                    //       child: Text('Vehicle No.',
+                    //       style: TextStyle(
+                    //         color: AppColor().colorBg1()
+                    //       ),),
+                    //     ),
+                    //     SizedBox(
+                    //       height: 10,
+                    //     ),
+                    //     Container(
+                    //       decoration: BoxDecoration(
+                    //           color: Colors.white,
+                    //           borderRadius: BorderRadius.circular(15),
+                    //           border: Border.all(color: AppColor().colorSecondary())
+                    //       ),
+                    //       height: 50,
+                    //       child: TextFormField(
+                    //           controller: vehicleController,
+                    //           validator: (msg) {
+                    //             if (msg!.isEmpty) {
+                    //               return "Please Enter Vehicle No.";
+                    //             }
+                    //           },
+                    //           decoration: InputDecoration(
+                    //               border: InputBorder.none
+                    //               // OutlineInputBorder(
+                    //               //     borderRadius:
+                    //               //     BorderRadius.circular(15))
+                    //           )
+                    //         // decoration: InputDecoration(
+                    //         //   border: OutlineInputBorder(),
+                    //         // ),
+                    //       ),
+                    //     ),
+                    //     const SizedBox(height: 10),
+                    //   ],
+                    // ): SizedBox.shrink(),
                     Padding(
                       padding: const EdgeInsets.only(top: 0.0, bottom: 20),
                       child: Column(
                         // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 5.0, top: 5, bottom: 10),
+                                child: Text(
+                                  "Profile Image",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      color: AppColor().colorBg1()
+                                  ),
+                                ),
+                              ),
+                              imageProfile(),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -2129,7 +1950,24 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
                               imageAadhar(),
                             ],
                           ),
-
+                          const SizedBox(height: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 5.0, top: 5, bottom: 10),
+                                child: Text(
+                                  "Aadhaar Card Back",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      color: AppColor().colorBg1()
+                                  ),
+                                ),
+                              ),
+                              imageAadharBack(),
+                            ],
+                          ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -2147,62 +1985,168 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
                               imagePan(),
                             ],
                           ),
-                          type == "2" || type == "3" || type == "4"
-                              ? Column(
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
-                                   Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 5.0, top: 10, bottom: 10),
-                                    child: Text(
-                                      "Registration Card",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: AppColor().colorBg1()
-                                      ),
-                                    ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: Text('Address',
+                                  style: TextStyle(
+                                      color: AppColor().colorBg1()
                                   ),
-                                  imageRC(),
-                                ],
+                                ),
                               ),
-                              Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
-                                   Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 5.0, top: 10, bottom: 10),
-                                    child: Text(
-                                      "Driving License",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: AppColor().colorBg1()
-                                      ),
-                                    ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  // _getPickLocation();
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(15),
+                                      border: Border.all(color: AppColor().colorSecondary())
                                   ),
-                                  imagedriving(),
-                                ],
+                                  // height: 60,
+                                  child: TextFormField(
+                                      maxLines: 1,
+                                      controller: addressController,
+                                      validator: (msg) {
+                                        if (msg!.isEmpty) {
+                                          return "Please Enter Address ";
+                                        }
+                                      },
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => PlacePicker(
+                                              apiKey: Platform.isAndroid
+                                                  ? "AIzaSyBmUCtQ_DlYKSU_BV7JdiyoOu1i4ybe-z0"
+                                                  : "AIzaSyBmUCtQ_DlYKSU_BV7JdiyoOu1i4ybe-z0",
+                                              onPlacePicked: (result) {
+                                                print(result.formattedAddress);
+                                                setState(() {
+                                                  addressController.text = result.formattedAddress.toString();
+                                                  pickLat = result.geometry!.location.lat;
+                                                  pickLong = result.geometry!.location.lng;
+                                                });
+                                                Navigator.of(context).pop();
+                                              },
+                                              initialPosition: LatLng(22.719568,75.857727
+                                                // double.parse(widget.lat.toString()), double.parse(widget.long.toString())
+                                              ),
+                                              useCurrentLocation: true,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.only(left: 10),
+                                          border: InputBorder.none
+                                      )
+                                    // decoration: InputDecoration(
+                                    //   border: OutlineInputBorder(),
+                                    // ),
+                                  ),
+                                ),
                               ),
                             ],
-                          )
-                              : SizedBox.shrink()
+                          ),
                         ],
                       ),
                     ),
-                    type == "1" || type == "8"
-                        ? SizedBox.shrink()
-                        : Column(
+                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(left: 10),
-                          child: Text("Location",
+                          child: Text("State",
+                            style: TextStyle(
+                                color: AppColor().colorBg1()
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Padding(
+                          padding:
+                          const EdgeInsets.only(top: 5.0, bottom: 10),
+                          child:
+                          Container(
+                            height: 55,
+                            width: MediaQuery.of(context).size.width/1.1,
+                            padding: EdgeInsets.only(left: 10),
+                            decoration: BoxDecoration(
+                                color: AppColor().colorBg1(),
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(
+                                    color: AppColor().colorSecondary(),
+                                ),
+                            ),
+                            child:  Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton2<StataData?>(
+                                  hint: const Text('Select State',
+                                    style: TextStyle(
+                                        color: colors.black54,fontWeight: FontWeight.w500,fontSize:15
+                                    ),
+                                  ),
+                                  value: stateValue,
+                                  icon: const Padding(
+                                    padding: EdgeInsets.only(left:0.0),
+                                    child: Icon(Icons.keyboard_arrow_down_rounded,  color:colors.secondary,size: 30,),
+                                  ),
+                                  style:  const TextStyle(color: colors.secondary,fontWeight: FontWeight.bold),
+                                  underline: Padding(
+                                    padding: const EdgeInsets.only(left: 0,right: 0),
+                                    child: Container(
+                                      // height: 2,
+                                      color:  colors.whiteTemp,
+                                    ),
+                                  ),
+                                  onChanged: (StataData? value) {
+                                    setState(() {
+                                      stateValue = value!;
+                                      _getCities("${stateValue!.id}");
+                                     stateName = stateValue!.name;
+                                     print("name herererb $stateName");
+                                    });
+                                  },
+                                  items: stateList.map((items) {
+                                    return DropdownMenuItem(
+                                      value: items,
+                                      child: Container(
+                                          child: Text(items.name.toString())),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    ),
+                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Text("City",
                           style: TextStyle(
                             color: AppColor().colorBg1()
-                          ),),
+                          ),
+                          ),
                         ),
                         SizedBox(
                           height: 8,
@@ -2211,373 +2155,797 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
                           padding:
                           const EdgeInsets.only(top: 5.0, bottom: 10),
                           child: Container(
-                            height: 60,
+                            height: 55,
+                            width: MediaQuery.of(context).size.width/1.1,
                             padding: EdgeInsets.only(left: 10),
                             decoration: BoxDecoration(
                               color: AppColor().colorBg1(),
-                                borderRadius: BorderRadius.circular(15),
-                                border: Border.all(
-                                    color: AppColor().colorSecondary())),
-                            child: DropdownButton(
-                              // Initial Value
-                              value: categoryValue,
-                              underline: Container(),
-                              isExpanded: true,
-                              // Down Arrow Icon
-                              icon: Icon(Icons.keyboard_arrow_down, color: AppColor().colorPrimary(),),
-                              hint: Text("Select City", style: TextStyle(
-                                color: AppColor.PrimaryDark
-                              ),),
-                              // Array list of items
-                              items: cityList.map((items) {
-                                return DropdownMenuItem(
-                                  value: items.id,
-                                  child: Container(
-                                      child: Text(items.name.toString())),
-                                );
-                              }).toList(),
-                              // After selecting the desired option,it will
-                              // change button value to selected value
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  categoryValue = newValue!;
-
-                                });
-                              },
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                color: AppColor().colorSecondary(),
+                              ),
+                            ),
+                            child:  Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton2<CityData?>(
+                                  hint: const Text('Select City',
+                                    style: TextStyle(
+                                        color: colors.black54,fontWeight: FontWeight.w500,fontSize:15
+                                    ),
+                                  ),
+                                  value: cityValue,
+                                  icon:  const Padding(
+                                    padding: EdgeInsets.only(left:0.0),
+                                    child: Icon(Icons.keyboard_arrow_down_rounded,  color:colors.secondary,size: 30,),
+                                  ),
+                                  style:  const TextStyle(color: colors.secondary,fontWeight: FontWeight.bold),
+                                  underline: Padding(
+                                    padding: const EdgeInsets.only(left: 0,right: 0),
+                                    child: Container(
+                                      // height: 2,
+                                      color:  colors.whiteTemp,
+                                    ),
+                                  ),
+                                  onChanged: (CityData? value) {
+                                    setState(() {
+                                      cityValue = value!;
+                                      cityName = cityValue!.name;
+                                      print("name herererb cityytyty $cityName");
+                                    });
+                                  },
+                                  items: cityList.map((items) {
+                                    return DropdownMenuItem(
+                                      value: items,
+                                      child: Container(
+                                          child: Text(items.name.toString())),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-
+                        Padding(
+                          padding: EdgeInsets.only(left: 10,top: 10, bottom: 0),
+                          child: Text('Pincode', style: TextStyle(
+                              color: Colors.white
+                          ),
+                          ),
+                        ),
                         SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                  color: AppColor().colorSecondary()
+                              ),
+                          ),
+                          // height: 50,
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            maxLength: 6,
+                            controller: pincodeCtr,
+                            validator: (msg) {
+                              if (msg!.isEmpty) {
+                                return "Please Enter pincode";
+                              }
+                            },
+                            decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 10),
+                                border: InputBorder.none,
+                                counterText: "",
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10,top: 10, bottom: 0),
+                          child: Text('Area', style: TextStyle(
+                              color: Colors.white
+                          ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(color: AppColor().colorSecondary())
+                          ),
+                          // height: 50,
+                          child: TextFormField(
+                            controller: areaCtr,
+                            validator: (msg) {
+                              if (msg!.isEmpty) {
+                                return "Please Enter area";
+                              }
+                            },
+                            decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 10),
+                                border: InputBorder.none
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                       type == "7" ?
+                       Column(
+                         crossAxisAlignment: CrossAxisAlignment.start,
+                         children: [
+                           Padding(
+                             padding: EdgeInsets.only(left: 10,top: 10, bottom: 0),
+                             child: Text('Educational Qualification', style: TextStyle(
+                                 color: Colors.white
+                             ),
+                             ),
+                           ),
+                           SizedBox(
+                             height: 10,
+                           ),
+                           Container(
+                             decoration: BoxDecoration(
+                                 color: Colors.white,
+                                 borderRadius: BorderRadius.circular(15),
+                                 border: Border.all(color: AppColor().colorSecondary())
+                             ),
+                             // height: 50,
+                             child: TextFormField(
+                               controller: educationCtr,
+                               validator: (msg) {
+                                 if (msg!.isEmpty) {
+                                   return "Please Enter education";
+                                 }
+                               },
+                               decoration: InputDecoration(
+                                   contentPadding: EdgeInsets.only(left: 10),
+                                   border: InputBorder.none
+                               ),
+                             ),
+                           ),
+                         ],
+                       ): SizedBox(
+                         height: 10,
+                       ),
+                        type == "7" ?
+                       Column(
+                         crossAxisAlignment: CrossAxisAlignment.start,
+                         children: [
+                         Padding(
+                           padding: EdgeInsets.only(left: 10,top: 10, bottom: 0),
+                           child: Text('Professional Qualification', style: TextStyle(
+                               color: Colors.white
+                           ),
+                           ),
+                         ),
+                         SizedBox(
+                           height: 10,
+                         ),
+                         Container(
+                           decoration: BoxDecoration(
+                               color: Colors.white,
+                               borderRadius: BorderRadius.circular(15),
+                               border: Border.all(color: AppColor().colorSecondary())
+                           ),
+                           // height: 50,
+                           child: TextFormField(
+                             controller: professionalCtr,
+                             validator: (msg) {
+                               if (msg!.isEmpty) {
+                                 return "Please Enter professional";
+                               }
+                             },
+                             decoration: InputDecoration(
+                                 contentPadding: EdgeInsets.only(left: 10),
+                                 border: InputBorder.none
+                             ),
+                           ),
+                         ),
+                       ],): SizedBox() ,
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        type == "7" ?
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(left: 10,top: 10, bottom: 0),
+                              child: Text('Sanskrit Qualification', style: TextStyle(
+                                  color: Colors.white
+                              ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color: AppColor().colorSecondary())
+                              ),
+                              // height: 50,
+                              child: TextFormField(
+                                controller: sanskritCtr,
+                                validator: (msg) {
+                                  if (msg!.isEmpty) {
+                                    return "Please Enter sanskrit";
+                                  }
+                                },
+                                decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 10),
+                                    border: InputBorder.none
+                                ),
+                              ),
+                            ),
+                          ],
+                        ): SizedBox(),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        type == "7" ?
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(left: 10,top: 10, bottom: 0),
+                              child: Text('Languages known', style: TextStyle(
+                                  color: Colors.white
+                              ),),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color: AppColor().colorSecondary())
+                              ),
+                              // height: 50,
+                              child: TextFormField(
+                                controller: languageCtr,
+                                validator: (msg) {
+                                  if (msg!.isEmpty) {
+                                    return "Please Enter language";
+                                  }
+                                },
+                                decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 10),
+                                    border: InputBorder.none
+                                ),
+                              ),
+                            ),
+                          ],
+                        ): SizedBox(),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                       type == "7" ?
+                       Column(
+                         crossAxisAlignment: CrossAxisAlignment.start,
+                         children: [
+                           Padding(
+                             padding: EdgeInsets.only(left: 10,top: 10, bottom: 0),
+                             child: Text('Veda studies', style: TextStyle(
+                                 color: Colors.white
+                             ),
+                             ),
+                           ),
+                           SizedBox(
+                             height: 10,
+                           ),
+                           Container(
+                             decoration: BoxDecoration(
+                                 color: Colors.white,
+                                 borderRadius: BorderRadius.circular(15),
+                                 border: Border.all(color: AppColor().colorSecondary())
+                             ),
+                             // height: 50,
+                             child: TextFormField(
+                               controller: vedaCtr,
+                               validator: (msg) {
+                                 if (msg!.isEmpty) {
+                                   return "Please Enter veda";
+                                 }
+                               },
+                               decoration: InputDecoration(
+                                   contentPadding: EdgeInsets.only(left: 10),
+                                   border: InputBorder.none
+                               ),
+                             ),
+                           ),
+                         ],
+                       ): SizedBox(),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10,top: 10, bottom: 0),
+                          child: Text('Years In Business', style: TextStyle(
+                              color: Colors.white
+                          ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(color: AppColor().colorSecondary())
+                          ),
+                          // height: 50,
+                          child: TextFormField(
+                            controller: yearBusinessCtr,
+                            validator: (msg) {
+                              if (msg!.isEmpty) {
+                                return "Please Enter year in business";
+                              }
+                            },
+                            decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 10),
+                                border: InputBorder.none
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10,top: 10, bottom: 0),
+                          child: Text('Locations Covered', style: TextStyle(
+                              color: Colors.white
+                          ),),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(color: AppColor().colorSecondary())
+                          ),
+                          // height: 50,
+                          child: TextFormField(
+                            controller: locationCoveredCtr,
+                            validator: (msg) {
+                              if (msg!.isEmpty) {
+                                return "Please Enter location";
+                              }
+                            },
+                            decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 10),
+                                border: InputBorder.none
+                              // OutlineInputBorder(
+                              //   borderSide: BorderSide(
+                              //     color: Colors.white
+                              //   ),
+                              //     borderRadius: BorderRadius.circular(15))
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        type == "7" ?
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(left: 10,top: 10, bottom: 0),
+                              child: Text('Caste', style: TextStyle(
+                                  color: Colors.white
+                              ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color: AppColor().colorSecondary())
+                              ),
+                              // height: 50,
+                              child: TextFormField(
+                                controller: casteCtr,
+                                validator: (msg) {
+                                  if (msg!.isEmpty) {
+                                    return "Please Enter caste";
+                                  }
+                                },
+                                decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 10),
+                                    border: InputBorder.none,
+                                  // OutlineInputBorder(
+                                  //   borderSide: BorderSide(
+                                  //     color: Colors.white
+                                  //   ),
+                                  //     borderRadius: BorderRadius.circular(15))
+                                ),
+                              ),
+                            ),
+                          ],
+                        ):
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        type == "7" ? SizedBox() : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(left: 10,top: 10, bottom: 0),
+                              child: Text('Testimonials', style: TextStyle(
+                                  color: Colors.white
+                              ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color: AppColor().colorSecondary())
+                              ),
+                              // height: 50,
+                              child: TextFormField(
+                                controller: testimonialsCtr,
+                                validator: (msg) {
+                                  if (msg!.isEmpty) {
+                                    return "Please Enter Testimonials";
+                                  }
+                                },
+                                decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 10),
+                                    border: InputBorder.none
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
                           height: 10,
                         ),
                       ],
                     ),
                   //  type == "6" || type == "7" ?
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10, bottom: 10),
-                      child: Text("Category",
-                      style: TextStyle(
-                        color: AppColor().colorBg1()
-                      ),),
-                    ),
+                  //   Padding(
+                  //     padding: const EdgeInsets.only(left: 10, bottom: 10),
+                  //     child: Text("Category",
+                  //     style: TextStyle(
+                  //       color: AppColor().colorBg1()
+                  //     ),
+                  //     ),
+                  //   ),
                    // : SizedBox.shrink(),
                 //   type == "6" || type == "7"
                     //?
-                    InkWell(
-                      onTap: (){
-                        _showMultiSelect();
-                      },
-                      child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          padding: EdgeInsets.only(left: 10),
-                          decoration: BoxDecoration(
-                            color: AppColor().colorBg1(),
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(
-                                  color: Colors.black.withOpacity(0.7))),
-                          child: _selectedItems.isEmpty ?
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10, top: 20, bottom: 20),
-                            child: Text(
-                              'Select Categories',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: colors.primary,
-                                fontWeight: FontWeight.normal,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          )
-                              :
-                          Wrap(
-                            children: _selectedItems
-                                .map((item){
-                              return Padding(
-                                padding: const EdgeInsets.only(left: 8.0, right: 8),
-                                child: Chip(
-                                  backgroundColor: AppColor().colorPrimary(),
-                                  label:
-                                  Text(
-                                      "${item.cName}",
-                                    style: TextStyle(
-                                      color: AppColor().colorBg1()
-                                    ),
-                                    //item.name
-                                  ),
-                                ),
-                              );
-                            })
-                                .toList(),
-                          )
-                        // FutureBuilder(
-                        //     future: getCities(),
-                        //     builder: (BuildContext context,
-                        //         AsyncSnapshot snapshot) {
-                        //       if (snapshot.hasData) {
-                        //         return DropdownButtonHideUnderline(
-                        //           child: DropdownButton2(
-                        //             isExpanded: true,
-                        //             hint: Row(
-                        //               children: [
-                        //                 Image.asset(
-                        //                   city,
-                        //                   width: 6.04.w,
-                        //                   height: 5.04.w,
-                        //                   fit: BoxFit.fill,
-                        //                   color: AppColor.PrimaryDark,
-                        //                 ),
-                        //                 SizedBox(
-                        //                   width: 4,
-                        //                 ),
-                        //                 Expanded(
-                        //                   child: Text(
-                        //                     'Select Multiple Cities',
-                        //                     style: TextStyle(
-                        //                       fontSize: 14,
-                        //                       fontWeight: FontWeight.normal,
-                        //                     ),
-                        //                     overflow: TextOverflow.ellipsis,
-                        //                   ),
-                        //                 ),
-                        //               ],
-                        //             ),
-                        //             items: cityList.map((item) {
-                        //               return DropdownMenuItem<String>(
-                        //                 value: item.id,
-                        //                 enabled: false,
-                        //                 child: StatefulBuilder(
-                        //                   builder: (context, menuSetState) {
-                        //                     final _isSelected =
-                        //                         selectedCities
-                        //                             .contains(item);
-                        //                     print("SLECTED CITY");
-                        //                     return InkWell(
-                        //                       onTap: () {
-                        //                         _isSelected
-                        //                             ? selectedCities
-                        //                                 .remove(item.id)
-                        //                             : selectedCities
-                        //                                 .add(item.id!);
-                        //                         setState(() {});
-                        //                         menuSetState(() {});
-                        //                       },
-                        //                       child: Container(
-                        //                         height: double.infinity,
-                        //                         padding: const EdgeInsets
-                        //                                 .symmetric(
-                        //                             horizontal: 16.0),
-                        //                         child: Row(
-                        //                           children: [
-                        //                             _isSelected
-                        //                                 ? const Icon(Icons
-                        //                                     .check_box_outlined)
-                        //                                 : const Icon(Icons
-                        //                                     .check_box_outline_blank),
-                        //                             const SizedBox(
-                        //                                 width: 16),
-                        //                             Text(
-                        //                               item.name!,
-                        //                               style:
-                        //                                   const TextStyle(
-                        //                                 fontSize: 14,
-                        //                               ),
-                        //                             ),
-                        //                           ],
-                        //                         ),
-                        //                       ),
-                        //                     );
-                        //                   },
-                        //                 ),
-                        //               );
-                        //             }).toList(),
-                        //             //Use last selected item as the current value so if we've limited menu height, it scroll to last item.
-                        //             value: selectedCities.isEmpty
-                        //                 ? null
-                        //                 : selectedCities.last,
-                        //             onChanged: (value) {},
-                        //             buttonHeight: 50,
-                        //             buttonWidth: 160,
-                        //             buttonPadding: const EdgeInsets.only(
-                        //                 left: 14, right: 14),
-                        //             buttonDecoration: BoxDecoration(
-                        //               borderRadius:
-                        //                   BorderRadius.circular(14),
-                        //               color: Color(0xffF9F9F9),
-                        //             ),
-                        //             buttonElevation: 0,
-                        //             itemHeight: 40,
-                        //             itemPadding: const EdgeInsets.only(
-                        //                 left: 14, right: 14),
-                        //             dropdownMaxHeight: 300,
-                        //             dropdownPadding: null,
-                        //             dropdownDecoration: BoxDecoration(
-                        //               borderRadius:
-                        //                   BorderRadius.circular(14),
-                        //             ),
-                        //             dropdownElevation: 8,
-                        //             scrollbarRadius:
-                        //                 const Radius.circular(40),
-                        //             scrollbarThickness: 6,
-                        //             scrollbarAlwaysShow: true,
-                        //             selectedItemBuilder: (context) {
-                        //               return cityList.map(
-                        //                 (item) {
-                        //                   return Container(
-                        //                     // alignment: AlignmentDirectional.center,
-                        //                     padding:
-                        //                         const EdgeInsets.symmetric(
-                        //                             horizontal: 16.0),
-                        //                     child: Text(
-                        //                       selectedCities.join(','),
-                        //                       style: const TextStyle(
-                        //                         fontSize: 14,
-                        //                         overflow:
-                        //                             TextOverflow.ellipsis,
-                        //                       ),
-                        //                       maxLines: 1,
-                        //                     ),
-                        //                   );
-                        //                 },
-                        //               ).toList();
-                        //             },
-                        //           ),
-                        //         );
-                        //       } else if (snapshot.hasError) {
-                        //         return Icon(Icons.error_outline);
-                        //       } else {
-                        //         return Center(
-                        //             child: CircularProgressIndicator());
-                        //       }
-                        //     })
-                      ),
-                    ),
-                  SizedBox(height: 10,),
+                    // InkWell(
+                    //   onTap: (){
+                    //     _showMultiSelect();
+                    //   },
+                    //   child: Container(
+                    //       width: MediaQuery.of(context).size.width,
+                    //       padding: EdgeInsets.only(left: 10),
+                    //       decoration: BoxDecoration(
+                    //         color: AppColor().colorBg1(),
+                    //           borderRadius: BorderRadius.circular(15),
+                    //           border: Border.all(
+                    //               color: Colors.black.withOpacity(0.7))),
+                    //       child: _selectedItems.isEmpty ?
+                    //       Padding(
+                    //         padding: const EdgeInsets.only(left: 10, top: 20, bottom: 20),
+                    //         child: Text(
+                    //           'Select Categories',
+                    //           style: TextStyle(
+                    //             fontSize: 16,
+                    //             color: colors.primary,
+                    //             fontWeight: FontWeight.normal,
+                    //           ),
+                    //           overflow: TextOverflow.ellipsis,
+                    //         ),
+                    //       )
+                    //           :
+                    //       Wrap(
+                    //         children: _selectedItems
+                    //             .map((item){
+                    //           return Padding(
+                    //             padding: const EdgeInsets.only(left: 8.0, right: 8),
+                    //             child: Chip(
+                    //               backgroundColor: AppColor().colorPrimary(),
+                    //               label:
+                    //               Text(
+                    //                   "${item.cName}",
+                    //                 style: TextStyle(
+                    //                   color: AppColor().colorBg1()
+                    //                 ),
+                    //                 //item.name
+                    //               ),
+                    //             ),
+                    //           );
+                    //         })
+                    //             .toList(),
+                    //       )
+                    //     // FutureBuilder(
+                    //     //     future: getCities(),
+                    //     //     builder: (BuildContext context,
+                    //     //         AsyncSnapshot snapshot) {
+                    //     //       if (snapshot.hasData) {
+                    //     //         return DropdownButtonHideUnderline(
+                    //     //           child: DropdownButton2(
+                    //     //             isExpanded: true,
+                    //     //             hint: Row(
+                    //     //               children: [
+                    //     //                 Image.asset(
+                    //     //                   city,
+                    //     //                   width: 6.04.w,
+                    //     //                   height: 5.04.w,
+                    //     //                   fit: BoxFit.fill,
+                    //     //                   color: AppColor.PrimaryDark,
+                    //     //                 ),
+                    //     //                 SizedBox(
+                    //     //                   width: 4,
+                    //     //                 ),
+                    //     //                 Expanded(
+                    //     //                   child: Text(
+                    //     //                     'Select Multiple Cities',
+                    //     //                     style: TextStyle(
+                    //     //                       fontSize: 14,
+                    //     //                       fontWeight: FontWeight.normal,
+                    //     //                     ),
+                    //     //                     overflow: TextOverflow.ellipsis,
+                    //     //                   ),
+                    //     //                 ),
+                    //     //               ],
+                    //     //             ),
+                    //     //             items: cityList.map((item) {
+                    //     //               return DropdownMenuItem<String>(
+                    //     //                 value: item.id,
+                    //     //                 enabled: false,
+                    //     //                 child: StatefulBuilder(
+                    //     //                   builder: (context, menuSetState) {
+                    //     //                     final _isSelected =
+                    //     //                         selectedCities
+                    //     //                             .contains(item);
+                    //     //                     print("SLECTED CITY");
+                    //     //                     return InkWell(
+                    //     //                       onTap: () {
+                    //     //                         _isSelected
+                    //     //                             ? selectedCities
+                    //     //                                 .remove(item.id)
+                    //     //                             : selectedCities
+                    //     //                                 .add(item.id!);
+                    //     //                         setState(() {});
+                    //     //                         menuSetState(() {});
+                    //     //                       },
+                    //     //                       child: Container(
+                    //     //                         height: double.infinity,
+                    //     //                         padding: const EdgeInsets
+                    //     //                                 .symmetric(
+                    //     //                             horizontal: 16.0),
+                    //     //                         child: Row(
+                    //     //                           children: [
+                    //     //                             _isSelected
+                    //     //                                 ? const Icon(Icons
+                    //     //                                     .check_box_outlined)
+                    //     //                                 : const Icon(Icons
+                    //     //                                     .check_box_outline_blank),
+                    //     //                             const SizedBox(
+                    //     //                                 width: 16),
+                    //     //                             Text(
+                    //     //                               item.name!,
+                    //     //                               style:
+                    //     //                                   const TextStyle(
+                    //     //                                 fontSize: 14,
+                    //     //                               ),
+                    //     //                             ),
+                    //     //                           ],
+                    //     //                         ),
+                    //     //                       ),
+                    //     //                     );
+                    //     //                   },
+                    //     //                 ),
+                    //     //               );
+                    //     //             }).toList(),
+                    //     //             //Use last selected item as the current value so if we've limited menu height, it scroll to last item.
+                    //     //             value: selectedCities.isEmpty
+                    //     //                 ? null
+                    //     //                 : selectedCities.last,
+                    //     //             onChanged: (value) {},
+                    //     //             buttonHeight: 50,
+                    //     //             buttonWidth: 160,
+                    //     //             buttonPadding: const EdgeInsets.only(
+                    //     //                 left: 14, right: 14),
+                    //     //             buttonDecoration: BoxDecoration(
+                    //     //               borderRadius:
+                    //     //                   BorderRadius.circular(14),
+                    //     //               color: Color(0xffF9F9F9),
+                    //     //             ),
+                    //     //             buttonElevation: 0,
+                    //     //             itemHeight: 40,
+                    //     //             itemPadding: const EdgeInsets.only(
+                    //     //                 left: 14, right: 14),
+                    //     //             dropdownMaxHeight: 300,
+                    //     //             dropdownPadding: null,
+                    //     //             dropdownDecoration: BoxDecoration(
+                    //     //               borderRadius:
+                    //     //                   BorderRadius.circular(14),
+                    //     //             ),
+                    //     //             dropdownElevation: 8,
+                    //     //             scrollbarRadius:
+                    //     //                 const Radius.circular(40),
+                    //     //             scrollbarThickness: 6,
+                    //     //             scrollbarAlwaysShow: true,
+                    //     //             selectedItemBuilder: (context) {
+                    //     //               return cityList.map(
+                    //     //                 (item) {
+                    //     //                   return Container(
+                    //     //                     // alignment: AlignmentDirectional.center,
+                    //     //                     padding:
+                    //     //                         const EdgeInsets.symmetric(
+                    //     //                             horizontal: 16.0),
+                    //     //                     child: Text(
+                    //     //                       selectedCities.join(','),
+                    //     //                       style: const TextStyle(
+                    //     //                         fontSize: 14,
+                    //     //                         overflow:
+                    //     //                             TextOverflow.ellipsis,
+                    //     //                       ),
+                    //     //                       maxLines: 1,
+                    //     //                     ),
+                    //     //                   );
+                    //     //                 },
+                    //     //               ).toList();
+                    //     //             },
+                    //     //           ),
+                    //     //         );
+                    //     //       } else if (snapshot.hasError) {
+                    //     //         return Icon(Icons.error_outline);
+                    //     //       } else {
+                    //     //         return Center(
+                    //     //             child: CircularProgressIndicator());
+                    //     //       }
+                    //     //     })
+                    //   ),
+                    // ),
+                  SizedBox(height: 10),
                   //  : SizedBox.shrink(),
-                    type == "1" || type == "8"
-                        ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Text(
-                            "Store Details",
-                            style: TextStyle(
-                              color: AppColor().colorBg1(),
-                                fontWeight: FontWeight.w600, fontSize: 18),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Text("Store Name",
-                          style: TextStyle(
-                            color: AppColor().colorBg1()
-                          ),),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: AppColor().colorSecondary())
-                          ),
-                          // height: 50,
-                          child: TextFormField(
-                              controller: storeNameController,
-                              validator: (msg) {
-                                if (msg!.isEmpty) {
-                                  return "Please Enter Store Name";
-                                }
-                              },
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 10),
-                                  border: InputBorder.none)
-                            // decoration: InputDecoration(
-                            //   border: OutlineInputBorder(),
-                            // ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Text("Store Description", style: TextStyle(
-                            color: AppColor().colorBg1()
-                          ),),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: AppColor().colorSecondary())
-                          ),
-                          // height: 50,
-                          child: TextFormField(
-                              controller: storeDescriptionController,
-                              validator: (msg) {
-                                if (msg!.isEmpty) {
-                                  return "Please Enter Store Description";
-                                }
-                              },
-                              decoration: InputDecoration(
-                                  border: InputBorder.none
-                              )
-                            // decoration: InputDecoration(
-                            //   border: OutlineInputBorder(),
-                            // ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Text("FSSAI",
-                          style: TextStyle(
-                            color: AppColor().colorBg1()
-                          ),),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: AppColor().colorSecondary())
-                          ),
-                          // height: 50,
-                          child: TextFormField(
-                              controller: fssaiController,
-                              validator: (msg) {
-                                if (msg!.isEmpty) {
-                                  return "Please Enter FSSAI No. ";
-                                }
-                              },
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 10),
-                                  border: InputBorder.none)
-                            // decoration: InputDecoration(
-                            //   border: OutlineInputBorder(),
-                            // ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                      ],
-                    )
-                        : SizedBox.shrink(),
-
+                  //   type == "1" || type == "8"
+                  //       ? Column(
+                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                  //     children: [
+                  //       Padding(
+                  //         padding: const EdgeInsets.only(left: 10),
+                  //         child: Text(
+                  //           "Store Details",
+                  //           style: TextStyle(
+                  //             color: AppColor().colorBg1(),
+                  //               fontWeight: FontWeight.w600, fontSize: 18),
+                  //         ),
+                  //       ),
+                  //       SizedBox(
+                  //         height: 10,
+                  //       ),
+                  //       Padding(
+                  //         padding: const EdgeInsets.only(left: 10),
+                  //         child: Text("Store Name",
+                  //         style: TextStyle(
+                  //           color: AppColor().colorBg1()
+                  //         ),
+                  //         ),
+                  //       ),
+                  //       SizedBox(
+                  //         height: 8,
+                  //       ),
+                  //       Container(
+                  //         decoration: BoxDecoration(
+                  //             color: Colors.white,
+                  //             borderRadius: BorderRadius.circular(15),
+                  //             border: Border.all(color: AppColor().colorSecondary())
+                  //         ),
+                  //         // height: 50,
+                  //         child: TextFormField(
+                  //             controller: storeNameController,
+                  //             validator: (msg) {
+                  //               if (msg!.isEmpty) {
+                  //                 return "Please Enter Store Name";
+                  //               }
+                  //             },
+                  //             decoration: InputDecoration(
+                  //               contentPadding: EdgeInsets.only(left: 10),
+                  //                 border: InputBorder.none)
+                  //           // decoration: InputDecoration(
+                  //           //   border: OutlineInputBorder(),
+                  //           // ),
+                  //         ),
+                  //       ),
+                  //       SizedBox(
+                  //         height: 10,
+                  //       ),
+                  //       Padding(
+                  //         padding: const EdgeInsets.only(left: 10),
+                  //         child: Text("Store Description", style: TextStyle(
+                  //           color: AppColor().colorBg1()
+                  //         ),),
+                  //       ),
+                  //       SizedBox(
+                  //         height: 8,
+                  //       ),
+                  //       Container(
+                  //         decoration: BoxDecoration(
+                  //             color: Colors.white,
+                  //             borderRadius: BorderRadius.circular(15),
+                  //             border: Border.all(color: AppColor().colorSecondary())
+                  //         ),
+                  //         // height: 50,
+                  //         child: TextFormField(
+                  //             controller: storeDescriptionController,
+                  //             validator: (msg) {
+                  //               if (msg!.isEmpty) {
+                  //                 return "Please Enter Store Description";
+                  //               }
+                  //             },
+                  //             decoration: InputDecoration(
+                  //                 border: InputBorder.none
+                  //             )
+                  //           // decoration: InputDecoration(
+                  //           //   border: OutlineInputBorder(),
+                  //           // ),
+                  //         ),
+                  //       ),
+                  //       SizedBox(
+                  //         height: 8,
+                  //       ),
+                  //       Padding(
+                  //         padding: const EdgeInsets.only(left: 10),
+                  //         child: Text("FSSAI",
+                  //         style: TextStyle(
+                  //           color: AppColor().colorBg1()
+                  //         ),),
+                  //       ),
+                  //       SizedBox(
+                  //         height: 8,
+                  //       ),
+                  //       Container(
+                  //         decoration: BoxDecoration(
+                  //             color: Colors.white,
+                  //             borderRadius: BorderRadius.circular(15),
+                  //             border: Border.all(color: AppColor().colorSecondary())
+                  //         ),
+                  //         // height: 50,
+                  //         child: TextFormField(
+                  //             controller: fssaiController,
+                  //             validator: (msg) {
+                  //               if (msg!.isEmpty) {
+                  //                 return "Please Enter FSSAI No. ";
+                  //               }
+                  //             },
+                  //             decoration: InputDecoration(
+                  //               contentPadding: EdgeInsets.only(left: 10),
+                  //                 border: InputBorder.none)
+                  //           // decoration: InputDecoration(
+                  //           //   border: OutlineInputBorder(),
+                  //           // ),
+                  //         ),
+                  //       ),
+                  //       SizedBox(
+                  //         height: 10,
+                  //       ),
+                  //     ],
+                  //   )
+                  //       : SizedBox.shrink(),
                     /// referral section
                     // Padding(
                     //   padding: const EdgeInsets.only(top:10,left: 10),
@@ -2610,9 +2978,9 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
                     //     // ),
                     //   ),
                     // ),
-                    SizedBox(
-                      height: 10.0,
-                    ),
+                    // SizedBox(
+                    //   height: 10.0,
+                    // ),
                     // Row(
                     //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     //   children: [
@@ -2644,57 +3012,65 @@ print("api url here  ${Apipath.vendorRegistrationUrl}");
                     //     ),
                     //   ],
                     // ),
-                    SizedBox(
-                      height: 15,
-                    ),
+                    // SizedBox(
+                    //   height: 15,
+                    // ),
                     InkWell(
-                      onTap: (){
-                        setState((){
+                      onTap: () {
+                        setState(() {
                           isLoading = true;
                         });
-                        if(passwordController.text == confirmPassController.text){
-
-                        // if(type =="1"){
-                          // if (gstController.text.isNotEmpty &&
-                          //     fssaiController.text.isNotEmpty &&
-                          //     storeDescriptionController.text.isNotEmpty
-                          //  && storeNameController.text.isNotEmpty) {
-                          if (isUpi == false) {
-                              if (_formKey.currentState!.validate()) {
-                                submitRequest();
-                              } else {
-                                setState((){
-                                  isLoading = false;
-                                });
-                                Fluttertoast.showToast(
-                                    msg: "All fields are required!!");
-                              }
-                            }
-                            else {
-                              if (accountNoController.text.isNotEmpty &&
-                                  accountHolderController.text.isNotEmpty &&
-                                  bankNameController.text.isNotEmpty &&
-                                  ifscController.text.isNotEmpty) {
-                                if(accountNoController.text == confmAccountNumController.text){
-                                  submitRequest();
-                                }else{
-                                  setState((){
-                                    isLoading = false;
-                                  });
-                                  Fluttertoast.showToast(msg: "Account number and Confirm Account Number must be same!");
-                                }
-                              }
-                              else {
-                                setState((){
-                                  isLoading = false;
-                                });
-                                Fluttertoast.showToast(
-                                    msg: "All fields are required!!");
-                              }
-                            }
-                            }else{
-                          Fluttertoast.showToast(msg: "Password and confirm password fields must be same!");
+                        if (_formKey.currentState!.validate()) {
+                          submitRequest();
+                        } else {
+                          setState((){
+                            isLoading = false;
+                          });
+                          Fluttertoast.showToast(
+                              msg: "All fields are required!!");
                         }
+                        // if(passwordController.text == confirmPassController.text){
+                        // // if(type =="1"){
+                        //   // if (gstController.text.isNotEmpty &&
+                        //   //     fssaiController.text.isNotEmpty &&
+                        //   //     storeDescriptionController.text.isNotEmpty
+                        //   //  && storeNameController.text.isNotEmpty) {
+                        //   if (isUpi == false) {
+                        //       if (_formKey.currentState!.validate()) {
+                        //         submitRequest();
+                        //       } else {
+                        //         setState((){
+                        //           isLoading = false;
+                        //         });
+                        //         Fluttertoast.showToast(
+                        //             msg: "All fields are required!!");
+                        //       }
+                        //     }
+                        //     else {
+                        //       if (accountNoController.text.isNotEmpty &&
+                        //           accountHolderController.text.isNotEmpty &&
+                        //           bankNameController.text.isNotEmpty &&
+                        //           ifscController.text.isNotEmpty) {
+                        //         if(accountNoController.text == confmAccountNumController.text){
+                        //           submitRequest();
+                        //         }else{
+                        //           setState((){
+                        //             isLoading = false;
+                        //           });
+                        //           Fluttertoast.showToast(msg: "Account number and Confirm Account Number must be same!");
+                        //         }
+                        //       }
+                        //       else {
+                        //         setState((){
+                        //           isLoading = false;
+                        //         });
+                        //         Fluttertoast.showToast(
+                        //             msg: "All fields are required!!");
+                        //       }
+                        //     }
+                        //     }else{
+                        //   Fluttertoast.showToast(msg: "Password and confirm password fields must be same!");
+                        // }
                           // } else {
                           //   setState((){
                           //     isLoading = false;

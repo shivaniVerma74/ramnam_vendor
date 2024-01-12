@@ -3,13 +3,13 @@ class Apipath {
   static const String BASH_URL =
       //"https://sodindia.com/api/";
    //   "https://developmentalphawizz.com/SOD_New/api/";
-  'https://developmentalphawizz.com/ramnaam/api/';
+  'https://raamnaam.com/api/';
       //"https://developmentalphawizz.com/new_ondemand/api/";
       //"https://alphawizztest.tk/ondemand/api/";
       static const String imagePath =
           //"https://sodindia.com/api/";
          // "https://developmentalphawizz.com/SOD_New/";
-      'https://developmentalphawizz.com/ramnaam/';
+      'https://raamnaam.com/';
       //"https://developmentalphawizz.com/new_ondemand/api/";
 
   static const String phone_login = BASH_URL + 'login_with_contact_vendor';
@@ -27,7 +27,6 @@ class Apipath {
   static const String completed_Work = BASH_URL + 'Completed_Work';
   static const String changePassword = BASH_URL + 'change_password';
   static const String notification = BASH_URL + 'order_notification_listing';
-
   static const String customer_support = BASH_URL + 'support';
   static const String get_faq = BASH_URL + 'get_faq';
   static const String payment_history = BASH_URL + 'get_payment_history';
@@ -46,7 +45,7 @@ class Apipath {
   static const String acceptRejectDeliveryUrl = BASH_URL + 'accept_delivery_request';
 
 ///New Urls
-  static const String vendorRegistrationUrl = BASH_URL + 'vendor_registration';
+  static const String vendorRegistrationUrl = BASH_URL + 'add_vendor';
   static const String sendOtpUrl = BASH_URL + 'v_send_otp';
   static const String verifyOtpUrl = BASH_URL + 'v_verify_otp';
   static const String email_login = BASH_URL + 'vendor_login';
@@ -68,6 +67,7 @@ class Apipath {
   static const String deleteProductUrl = BASH_URL +'delete_product';
   static const String deleteServicesUrl = BASH_URL +'delete_service';
   static const String getCitiesUrl = BASH_URL +'get_cities';
+  static const String getStateUrl = BASH_URL +'get_states';
   static const String getEventCatUrl = BASH_URL +'get_categories_list';
   static const String getServiceBookingUrl = BASH_URL +'get_booking_by_vendor';
   static const String getRequestBookingUrl = BASH_URL +'get_vendor_services_request';
@@ -82,7 +82,6 @@ class Apipath {
   static const String onOffUrl = BASH_URL + 'update_vendor_status';
   static const String accRejFoodDeliveryUrl = BASH_URL +'driver_accept_reject_status';
   static const String completeRideUrl = BASH_URL +'complete_ride_booking';
-
   static const String getFoodReviewUrl = BASH_URL + 'get_review_by_customer';
   static const String getWalletTransUrl = BASH_URL + 'get_wallet_transactions';
   static const String getTicketsTypeApi = BASH_URL + 'get_ticket_types';
@@ -91,18 +90,11 @@ class Apipath {
   static const String addTicketApi = BASH_URL + 'add_ticket';
   static const String sendMsgApi = BASH_URL + 'send_message';
   static const String getMsgApi = BASH_URL + 'get_messages';
-
   static const String checkOutVendorApi = BASH_URL + 'checkout_vendor';
-
   static const String getSettings = BASH_URL + 'general_setting';
-
   static const String getWalletHistory = BASH_URL + 'withdrawl_list';
   static const String withdrawRequestUrl = BASH_URL + 'withdrawl_request';
-
   static const String forgetPassUrl = BASH_URL + 'forgot_pass_vendor';
-
-
-
 }
 
 const String ID = 'id';

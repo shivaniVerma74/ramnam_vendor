@@ -29,7 +29,7 @@ class _SignUpState extends State<SignUp> {
     // 'Mehendi Artist',
     // 'Event Planner',
     // 'Handy Man Services',
-    'Pandit Ji',
+    'Purohit',
     'Grocery',
     'Photographer',
     'Tent House',
@@ -58,6 +58,7 @@ class _SignUpState extends State<SignUp> {
     super.initState();
     getUserCurrentLocation();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,7 +77,7 @@ class _SignUpState extends State<SignUp> {
                       )
                   ),
                   width: MediaQuery.of(context).size.width,
-                  height:150,
+                  height: 240,
                   child: Container(
                     width: MediaQuery.of(context).size.width/2,
                     child: Image.asset(
@@ -86,8 +87,6 @@ class _SignUpState extends State<SignUp> {
                     ),
                   ),
                 ),
-
-
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Container(
@@ -100,7 +99,6 @@ class _SignUpState extends State<SignUp> {
                         //     ),
                         //   fit: BoxFit.contain
                         // ),
-
                     ),
                     child: Column(
                       children: [
@@ -114,8 +112,6 @@ class _SignUpState extends State<SignUp> {
                                 fontWeight: FontWeight.w500),
                           ),
                         ),
-
-
                         Padding(
                           padding: const EdgeInsets.only(left: 15.0, right: 15),
                           child: Container(
@@ -130,21 +126,28 @@ class _SignUpState extends State<SignUp> {
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
-                                hint: Text("Select Vendor Type",
-                                style: TextStyle(
-                                  color: AppColor().colorPrimary()
-                                ),),
+                                hint: Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: Text("Select Vendor Type",
+                                  style: TextStyle(
+                                    color: AppColor().colorPrimary()
+                                  ),
+                                  ),
+                                ),
                                 dropdownColor: AppColor().colorBg1(),
                                 value: dropdownValue,
                                 icon:  Padding(
-                                  padding: const EdgeInsets.only(bottom: 8.0),
-                                  child: Icon(Icons.keyboard_arrow_down_rounded,  color: AppColor().colorPrimary(),),
+                                  padding: const EdgeInsets.only(bottom: 7.0),
+                                  child: Icon(Icons.keyboard_arrow_down_rounded,  color: AppColor().colorPrimary()),
                                 ),
                                 elevation: 16,
-                                style:  TextStyle(color: AppColor().colorPrimary(),fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                    color: AppColor().colorPrimary(),
+                                    fontWeight: FontWeight.bold,
+                                ),
                                 underline: Container(
                                   // height: 2,
-                                  color:  AppColor().colorPrimary(),
+                                  color: AppColor().colorPrimary(),
                                 ),
                                 onChanged: (String? value) {
                                   // This is called when the user selects an item.
@@ -152,8 +155,7 @@ class _SignUpState extends State<SignUp> {
                                     dropdownValue = value!;
                                   });
                                 },
-                                items: items
-                                    .map<DropdownMenuItem<String>>((String value) {
+                                items: items.map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child:
@@ -165,15 +167,13 @@ class _SignUpState extends State<SignUp> {
                                         Divider(
                                           thickness: 2,
                                           color: AppColor().colorPrimary(),
-                                        )
+                                        ),
                                       ],
                                     ),
                                   );
                                 }).toList(),
                               ),
-
-                            )
-
+                            ),
                             // DropdownButtonHideUnderline(
                             //   child: DropdownButton(
                             //     // isExpanded: true,
@@ -265,18 +265,20 @@ class _SignUpState extends State<SignUp> {
                           padding: const EdgeInsets.only(left: 15.0, right: 15),
                           child: AppBtn(
                             label: "Submit",
-                            onPress: (){
+                            onPress: () {
                               if (dropdownValue == null || dropdownValue == "") {
                                 Fluttertoast.showToast(msg: "Please select vendor type");
-                              }else{
-                                Navigator.push(context,
+                              } else {
+                                Navigator.push(
+                                  context,
                                     MaterialPageRoute(builder: (context) =>
                                         VendorRegisteration(
                                           role: dropdownValue.toString(),
                                           lat: lat,
                                           long: long,
-                                        )));
-
+                                        ),
+                                    ),
+                                );
                               }
                             },
                           ),
@@ -299,20 +301,20 @@ class _SignUpState extends State<SignUp> {
                         //     fixedSize: Size(320, 45),
                         //   ),
                         // ),
-                        SizedBox(height: 30,),
+                        SizedBox(height: 30),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("Already have an account? ",style: TextStyle(fontWeight: FontWeight.w400,  color: AppColor().colorBg1(), fontSize: 16),),
+                            Text("Already have an account?",style: TextStyle(fontWeight: FontWeight.w400,  color: AppColor().colorBg1(), fontSize: 16)),
                             GestureDetector(
                               //   onTap: (){},
-                              child: Text("Log in",style: TextStyle(color: AppColor().colorBg1(),fontSize: 16, decoration: TextDecoration.underline, fontWeight: FontWeight.w600),),
-                              onTap: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context) =>Login()));
+                              child: Text("Log in",style: TextStyle(color: AppColor(). colorBg1(), fontSize: 16, decoration: TextDecoration.underline, fontWeight: FontWeight.w600)),
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
                               },
                             ),
                           ],
-                        )
+                        ),
                         // InkWell(
                         //   onTap: () {
                         //     Navigator.push(
@@ -346,7 +348,8 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
               ],
-            ),)
+            ),
+          ),
       ),
     );
   }

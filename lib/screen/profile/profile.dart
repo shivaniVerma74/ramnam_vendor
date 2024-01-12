@@ -73,7 +73,8 @@ class _ProfileState extends State<Profile> {
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(45),
                                 topRight: Radius.circular(45),
-                              )),
+                              ),
+                          ),
                           child: Padding(
                             padding:
                                 const EdgeInsets.only(left: 30.0, right: 30),
@@ -149,7 +150,7 @@ class _ProfileState extends State<Profile> {
                                                     type == "7" || type == "6" || type == "8" || type == "5" ? SizedBox.shrink()  :  SizedBox(
                                                       height: 15,
                                                     ),
-                                             type == "7" || type == "6" || type == "5" ? SizedBox.shrink() :  Text("GST  Number:",
+                                                  type == "7" || type == "6" || type == "5" ? SizedBox.shrink() :  Text("GST  Number:",
                                                       style: TextStyle(
                                                           fontWeight: FontWeight.w600
                                                       ),),
@@ -232,8 +233,11 @@ class _ProfileState extends State<Profile> {
                                                 SizedBox(
                                                   height: 15,
                                                 ),
-                                                Text(
-                                                    "${profileModel!.data![0].email}"),
+                                                Container(
+                                                  width: MediaQuery.of(context).size.width/2,
+                                                  child: Text(
+                                                      "${profileModel!.data![0].email}", overflow: TextOverflow.ellipsis),
+                                                ),
                                                 SizedBox(
                                                   height: 15,
                                                 ),
@@ -244,17 +248,16 @@ class _ProfileState extends State<Profile> {
                                                 ),
                                                 type == "2"|| type == "3"|| type =="4"?
                                                 SizedBox.shrink()
-                                                    :
-                                                    Column(
+                                                    : Column(
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
-                                                     type == "7"|| type == "6" || type == "8" || type == "5" ? SizedBox.shrink() :   Text(type == "1"?
+                                                     type == "7"|| type == "6" || type == "8" || type == "5" ? SizedBox.shrink():Text(type == "1"?
                                                         "${profileModel!.data![0].storeName}"
                                                             : "${profileModel!.data![0].companyName}"),
-                                                   type == "7" || type == "6" || type == "8" || type == "5"  ? SizedBox.shrink()  :    SizedBox(
+                                                   type == "7" || type == "6" || type == "8" || type == "5"  ? SizedBox.shrink():SizedBox(
                                                           height: 15,
                                                         ),
-                                                   type == "7" || type == "6" || type == "5" ? SizedBox.shrink() :  Text(
+                                                   type == "7" || type == "6" || type == "5" ? SizedBox.shrink():Text(
                                                           "${profileModel!.data![0].gstNo}",
                                                           // maxLines: 3,
                                                           style: TextStyle(
@@ -267,17 +270,13 @@ class _ProfileState extends State<Profile> {
                                                         ),
                                                       ],
                                                     ),
-
                                              type == "1"?  Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     "${profileModel!.data![0].fssai}",
                                                     // maxLines: 3,
-                                                    style: TextStyle(
-                                                        overflow:
-                                                        TextOverflow
-                                                            .ellipsis),
+                                                    style: TextStyle(overflow: TextOverflow.ellipsis),
                                                   ),
                                                   SizedBox(
                                                     height: 15,
@@ -286,9 +285,7 @@ class _ProfileState extends State<Profile> {
                                                     "${profileModel!.data![0].storeDescription}",
                                                     // maxLines: 3,
                                                     style: TextStyle(
-                                                        overflow:
-                                                        TextOverflow
-                                                            .ellipsis),
+                                                        overflow: TextOverflow.ellipsis),
                                                   ),
                                                   SizedBox(
                                                     height: 15,
@@ -305,7 +302,8 @@ class _ProfileState extends State<Profile> {
                                                           overflow:
                                                           TextOverflow
                                                               .ellipsis),
-                                                    )),
+                                                    ),
+                                                ),
                                                 SizedBox(
                                                   height: 5,
                                                 ),
@@ -317,8 +315,7 @@ class _ProfileState extends State<Profile> {
                                                     : Container(
                                                     height: 50,
                                                     width: 80,
-                                                    child: ClipRRect(borderRadius:
-                                                        BorderRadius.circular(6), child:
+                                                    child: ClipRRect(borderRadius: BorderRadius.circular(6), child:
                                                         Image.network("${profileModel!.data![0].adharCard.toString()}", fit:
                                                         BoxFit.fill,
                                                         ),
@@ -460,6 +457,7 @@ class _ProfileState extends State<Profile> {
                                                       builder: (
                                                           context) =>
                                                           EditNewProfile(
+                                                           profileModel: profileModel,
                                                             model: profileModel!
                                                                 .data![
                                                             0],

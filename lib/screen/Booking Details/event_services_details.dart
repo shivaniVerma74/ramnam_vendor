@@ -1439,6 +1439,7 @@ class _EventServiceDetailsState extends State<EventServiceDetails> {
                                           )
                                         ],
                                       ),
+                                      type != "6" ?
                                       Row(
                                         mainAxisAlignment:
                                         MainAxisAlignment
@@ -1462,7 +1463,7 @@ class _EventServiceDetailsState extends State<EventServiceDetails> {
                                                 FontWeight.w600),
                                           )
                                         ],
-                                      ),
+                                      ): SizedBox(),
                                      type == "5" ? Row(
                                         mainAxisAlignment:
                                         MainAxisAlignment
@@ -1525,7 +1526,31 @@ class _EventServiceDetailsState extends State<EventServiceDetails> {
                                                 FontWeight.normal),
                                           ),
                                           Text(
-                                            "${widget.data.products![index].perDCharge}",
+                                            "${widget.data.vendorPayemntAmount}",
+                                            // maxLines: 2,
+                                            style: TextStyle(
+                                                color: AppColor()
+                                                    .colorPrimary(),
+                                                fontWeight:
+                                                FontWeight.w600),
+                                          )
+                                        ],
+                                      ) : SizedBox(),
+                                      type == "6" ?  Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment
+                                            .spaceBetween,
+                                        children: [
+                                          Text(
+                                            "Hours",
+                                            style: TextStyle(
+                                                color: AppColor()
+                                                    .colorPrimary(),
+                                                fontWeight:
+                                                FontWeight.normal),
+                                          ),
+                                          Text(
+                                            "${widget.data.hours} hr.",
                                             // maxLines: 2,
                                             style: TextStyle(
                                                 color: AppColor()

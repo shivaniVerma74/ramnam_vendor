@@ -1,17 +1,17 @@
-class CityModel {
+class StateModel {
   String? responseCode;
   String? msg;
-  List<CityData>? data;
+  List<StataData>? data;
 
-  CityModel({this.responseCode, this.msg, this.data});
+  StateModel({this.responseCode, this.msg, this.data});
 
-  CityModel.fromJson(Map<String, dynamic> json) {
+  StateModel.fromJson(Map<String, dynamic> json) {
     responseCode = json['response_code'];
     msg = json['msg'];
     if (json['data'] != null) {
-      data = <CityData>[];
+      data = <StataData>[];
       json['data'].forEach((v) {
-        data!.add(new CityData.fromJson(v));
+        data!.add(new StataData.fromJson(v));
       });
     }
   }
@@ -27,33 +27,19 @@ class CityModel {
   }
 }
 
-class CityData {
+class StataData {
   String? id;
   String? name;
-  Null? image;
-  Null? description;
   String? countryId;
-  String? stateId;
   String? createdAt;
   String? updatedAt;
 
-  CityData(
-      {this.id,
-        this.name,
-        this.image,
-        this.description,
-        this.countryId,
-        this.stateId,
-        this.createdAt,
-        this.updatedAt});
+  StataData({this.id, this.name, this.countryId, this.createdAt, this.updatedAt});
 
-  CityData.fromJson(Map<String, dynamic> json) {
+  StataData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
-    image = json['image'];
-    description = json['description'];
     countryId = json['country_id'];
-    stateId = json['state_id'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
@@ -62,10 +48,7 @@ class CityData {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['name'] = this.name;
-    data['image'] = this.image;
-    data['description'] = this.description;
     data['country_id'] = this.countryId;
-    data['state_id'] = this.stateId;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
     return data;

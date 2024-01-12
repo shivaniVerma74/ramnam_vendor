@@ -99,8 +99,6 @@
 //     }
 //   }
 // }
-
-
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fixerking/screen/BottomBars/bottom_bar_delivery.dart';
@@ -134,7 +132,7 @@ class _FastsplashState extends State<Fastsplash> {
     super.initState();
     getToken();
     checkingLogin();
-    PushNotificationService notificationService =  PushNotificationService(context: context);
+    PushNotificationService notificationService = PushNotificationService(context: context);
     notificationService.initialise();
   }
 
@@ -186,14 +184,13 @@ class _FastsplashState extends State<Fastsplash> {
     if(uid == null || uid == ""){
       Future.delayed(Duration(
           seconds: 3
-      ), (){
+      ), () {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> GetStarted()));
       });
-
-    }else{
+    } else {
       Future.delayed(Duration(
           seconds: 3
-      ), (){
+      ),() {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>
         type == "2" ||  type == "3" || type =="4" ?
         BottomBarDelivery() : BottomBar()));

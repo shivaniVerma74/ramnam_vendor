@@ -12,6 +12,7 @@ import 'package:fixerking/new%20model/banner_model.dart';
 import 'package:fixerking/new%20model/buy_vendor_product.dart';
 import 'package:fixerking/new%20model/delivery_booking_model.dart';
 import 'package:fixerking/new%20model/food_delivery_model.dart';
+
 // import 'package:fixerking/new%20model/delivery_booking_model.dart';
 import 'package:fixerking/new%20model/get_settings_model.dart';
 import 'package:fixerking/new%20model/ride_booking_model.dart';
@@ -52,6 +53,7 @@ import 'RequestServicesScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String? bookingId;
+
   const HomeScreen({Key? key, this.bookingId}) : super(key: key);
 
   @override
@@ -87,11 +89,18 @@ class _HomeScreenState extends State<HomeScreen> {
     var headers = {
       'Cookie': 'ci_session=af94a6a054dc2ff954d970c4fe45f3784ea1c80d'
     };
-    print("paramerts are here ${Apipath.getServiceBookingUrl} and ${uid} and ${bookingID} ");
+    print(
+        "paramerts are here ${Apipath.getServiceBookingUrl} and $uid and $bookingID ");
     var request = http.MultipartRequest(
         'POST', Uri.parse('${Apipath.getServiceBookingUrl}'));
-    request.fields.addAll({'user_id': '${uid.toString()}',
-      'booking_id': widget.bookingId == "" || widget.bookingId == null ? bookingID == "null" || bookingID == null  ? "" : bookingID.toString() : widget.bookingId.toString()});
+    request.fields.addAll({
+      'user_id': '${uid.toString()}',
+      'booking_id': widget.bookingId == "" || widget.bookingId == null
+          ? bookingID == "null" || bookingID == null
+              ? ""
+              : bookingID.toString()
+          : widget.bookingId.toString()
+    });
     print("there is require ${request.fields}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -99,14 +108,15 @@ class _HomeScreenState extends State<HomeScreen> {
     if (response.statusCode == 200) {
       var finalResponse = await response.stream.bytesToString();
       print("checking response here ${finalResponse} here");
-      final jsonResponse = VendorBookingModel.fromJson(json.decode(finalResponse));
+      final jsonResponse =
+          VendorBookingModel.fromJson(json.decode(finalResponse));
       print(" final response here ${jsonResponse.responseCode} ");
       return VendorBookingModel.fromJson(json.decode(finalResponse));
     } else {
       print(response.reasonPhrase);
     }
   }
-  
+
   Future getFoodOrders() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? uid = prefs.getString(TokenString.userid);
@@ -165,20 +175,28 @@ class _HomeScreenState extends State<HomeScreen> {
         Uri.parse(type == "1" || type == "8"
             ? '${Apipath.acceptRejectFoodStatus}'
             :
-        //type == "2" || type == "3" || type == "4"
-                 '${Apipath.acceptRejectServiceStatus}'));
+            //type == "2" || type == "3" || type == "4"
+            '${Apipath.acceptRejectServiceStatus}'));
     if (type == "1" || type == "8") {
-      request.fields.addAll({'order_id': '$id', 'status': '$status', 'roll': '1'});
+      request.fields
+          .addAll({'order_id': '$id', 'status': '$status', 'roll': '1'});
     } else {
-      request.fields.addAll({'booking_id': '$id', 'status': '$status','user_id':uid.toString()});
+      request.fields.addAll({
+        'booking_id': '$id',
+        'status': '$status',
+        'user_id': uid.toString()
+      });
     }
-    print("request of status ===>>> ${ type == "1" || type == "8" ? Apipath.acceptRejectFoodStatus : Apipath.acceptRejectServiceStatus} ${request.fields}");
+    print("-----------------requesttttttt${request.fields}");
+    print(
+        "request of status ===>>> ${type == "1" || type == "8" ? Apipath.acceptRejectFoodStatus : Apipath.acceptRejectServiceStatus} ${request.fields}");
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       print("this response @@ ${response.statusCode}");
       final str = await response.stream.bytesToString();
       var data = UpdateOrder.fromJson(json.decode(str));
-      _refresh();
+      // _refresh();
+
       // await getDeliverRideBooking(deliveryModel!.id);
       Fluttertoast.showToast(msg: data.message.toString());
       return UpdateOrder.fromJson(json.decode(str));
@@ -313,7 +331,8 @@ class _HomeScreenState extends State<HomeScreen> {
     //   "Accept": "application/json",
     // };
     request.headers.addAll({'type': "$type"});
-    print("checking buy vendor product ${Apipath.buyVendorProductUrl} and ${type}");
+    print(
+        "checking buy vendor product ${Apipath.buyVendorProductUrl} and ${type}");
     // request.fields['vendor_id'] = userID;
     var response = await request.send();
     print(response.statusCode);
@@ -369,6 +388,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   cardWidget(GetVendorOrderModel model, int i) {
+    print("----orderStatusishere------${model.orders![i].orderStatus == "1"}");
     return InkWell(
       onTap: () {
         Navigator.push(
@@ -378,7 +398,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       data: model.orders![i],
                       type: type.toString(),
                       uid: uid.toString(),
-                    )));
+                    ),
+            ),
+        );
       },
       child: Padding(
         padding: const EdgeInsets.all(4.0),
@@ -529,6 +551,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 //     dashGapRadius: 0.0,
                 //   ),
                 // ),
+
                 Container(
                   height: 60,
                   width: MediaQuery.of(context).size.width,
@@ -540,12 +563,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      model.orders![i].orderStatus == "1"
+                      model.orders![i].orderStatus == 1
                           ? Padding(
                               padding: const EdgeInsets.only(top: 7.0),
                               child: Center(
                                 child: ElevatedButton(
                                     onPressed: () {
+
                                       //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -562,29 +586,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     )),
                               ),
                             )
-                      : model.orders![i].orderStatus == "5"
-                          ? Padding(
-                        padding: const EdgeInsets.only(top: 7.0),
-                        child: Center(
-                          child: ElevatedButton(
-                              onPressed: () {
-                                //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                  primary: Colors.green,
-                                  fixedSize: Size(140, 35),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(10),
-                                  )),
-                              child: Text(
-                                "Accepted",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w400),
-                              )),
-                        ),
-                      )
-                          : model.orders![i].orderStatus == "2"
+                          : model.orders![i].orderStatus == "5"
                               ? Padding(
                                   padding: const EdgeInsets.only(top: 7.0),
                                   child: Center(
@@ -606,7 +608,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         )),
                                   ),
                                 )
-                              : model.orders![i].orderStatus == "3"
+                              : model.orders![i].orderStatus == "2"
                                   ? Padding(
                                       padding: const EdgeInsets.only(top: 7.0),
                                       child: Center(
@@ -622,58 +624,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       BorderRadius.circular(10),
                                                 )),
                                             child: Text(
-                                              "Completed",
+                                              "Accepted",
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w400),
                                             )),
                                       ),
                                     )
-                                  : model.orders![i].orderStatus == "4"
+                                  : model.orders![i].orderStatus == "3"
                                       ? Padding(
                                           padding:
                                               const EdgeInsets.only(top: 7.0),
-                                          child: ElevatedButton(
-                                              onPressed: () {
-                                                updateFoodOrderStatus(
-                                                    "${model.orders![i].orderId.toString()}",
-                                                    "4");
-                                                // if(type =="1"){
-                                                //   getFoodOrders();
-                                                // }else{
-                                                //   getVendorBooking();
-                                                // }
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                  primary: Colors.red,
-                                                  fixedSize: Size(140, 35),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                              ),
-                                              child: Text(
-                                                "Declined",
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.w400),
-                                              )),
-                                        )
-                                      : Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            ElevatedButton(
+                                          child: Center(
+                                            child: ElevatedButton(
                                                 onPressed: () {
-                                                  updateFoodOrderStatus(
-                                                      "${model.orders![i].orderId.toString()}",
-                                                      "1");
-                                                  // _refresh();
-                                                  // if(type =="1"){
-                                                  //   getFoodOrders();
-                                                  // }else{
-                                                  //   getVendorBooking();
-                                                  // }
+                                                  //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
                                                 },
                                                 style: ElevatedButton.styleFrom(
                                                     primary: Colors.green,
@@ -683,30 +647,32 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               10),
-                                                    ),
-                                                ),
+                                                    )),
                                                 child: Text(
-                                                  "Accept",
+                                                  "Completed",
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.w400),
-                                                ),
-                                            ),
-                                            const SizedBox(
-                                              width: 15,
-                                            ),
-                                            ElevatedButton(
-                                                onPressed: () {
-                                                  updateFoodOrderStatus(
-                                                      "${model.orders![i].orderId.toString()}",
-                                                      "4");
-                                                  // if(type =="1"){
-                                                  //   getFoodOrders();
-                                                  // }else{
-                                                  //   getVendorBooking();
-                                                  // }
-                                                },
-                                                style: ElevatedButton.styleFrom(
+                                                )),
+                                          ),
+                                        )
+                                      : model.orders![i].orderStatus == "4"
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 7.0),
+                                              child: ElevatedButton(
+                                                  onPressed: () {
+                                                    updateFoodOrderStatus(
+                                                        "${model.orders![i].orderId.toString()}",
+                                                        "4");
+                                                    // if(type =="1"){
+                                                    //   getFoodOrders();
+                                                    // }else{
+                                                    //   getVendorBooking();
+                                                    // }
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
                                                     primary: Colors.red,
                                                     fixedSize: Size(140, 35),
                                                     shape:
@@ -714,16 +680,86 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               10),
-                                                    )),
-                                                child: Text(
-                                                  "Decline",
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w400),
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    "Declined",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w400),
+                                                  )),
+                                            )
+                                          : Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    updateFoodOrderStatus(
+                                                        "${model.orders![i].orderId.toString()}",
+                                                        "1");
+                                                    // _refresh();
+                                                    // if(type =="1"){
+                                                    //   getFoodOrders();
+                                                    // }else{
+                                                    //   getVendorBooking();
+                                                    // }
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    primary: Colors.green,
+                                                    fixedSize: Size(140, 35),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    "Accept",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w400),
+                                                  ),
                                                 ),
+                                                const SizedBox(
+                                                  width: 15,
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    updateFoodOrderStatus(
+                                                        "${model.orders![i].orderId.toString()}",
+                                                        "4");
+                                                    // if(type =="1"){
+                                                    //   getFoodOrders();
+                                                    // }else{
+                                                    //   getVendorBooking();
+                                                    // }
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          primary: Colors.red,
+                                                          fixedSize:
+                                                              Size(140, 35),
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                          )),
+                                                  child: Text(
+                                                    "Decline",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w400),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
                     ],
                   ),
                 ),
@@ -736,177 +772,465 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   cardWidget1(VendorBookingModel model, int i) {
-    return model.data![i].status == "1" ?
-    InkWell(
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => EventServiceDetails(
-                      data: model.data![i],
-                    ),
-            ),
-        );
-      },
-      child:
-      Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Card(
-          elevation: 5,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          child: Container(
-            // padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              border: Border.all(color: AppColor.PrimaryDark),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Column(
-              children: [
-                Padding(
-                  padding:  EdgeInsets.only(
-                      top: 12.0, bottom: 8, left: 15, right: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Name",
-                        style: TextStyle(
-                            color: AppColor().colorPrimary(),
-                            fontWeight: FontWeight.normal),
-                      ),
-                      Text(
-                        "${model.data![i].username}",
-                        style: TextStyle(
-                            color: AppColor().colorPrimary(),
-                            fontWeight: FontWeight.bold),
-                      )
-                    ],
+    print('----orderStatusishere------${model.data![i].status}');
+    return model.data![i].status == "1"
+        ? InkWell(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => EventServiceDetails(
+                    data: model.data![i],
                   ),
                 ),
-                // ListView.builder(
-                //   itemCount: model.data![i].products!.length,
-                //     itemBuilder: (context, index){
-                //   return
-                Padding(
-                  padding: const EdgeInsets.only(
-                      top: 4.0, bottom: 4, left: 15, right: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Job",
-                        style: TextStyle(
-                            color: AppColor().colorPrimary(),
-                            fontWeight: FontWeight.normal),
-                      ),
-                      Text(
-                        "${model.data![i].products![0].artistName}",
-                        // maxLines: 2,
-                        style: TextStyle(
-                            color: AppColor().colorPrimary(),
-                            fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                ),
-                // ;
-                //            }),
-                Padding(
-                  padding: const EdgeInsets.only(
-                      top: 4.0, bottom: 4, left: 15, right: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Amount",
-                        style: TextStyle(
-                            color: AppColor().colorPrimary(),
-                            fontWeight: FontWeight.normal),
-                      ),
-                      Text(
-                        "₹ ${model.data![i].subtotal}",
-                        style: TextStyle(
-                            color: AppColor().colorPrimary(),
-                            fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                      top: 4.0, bottom: 4, left: 15, right: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Date",
-                        style: TextStyle(
-                            color: AppColor().colorPrimary(),
-                            fontWeight: FontWeight.normal),
-                      ),
-                      Text(
-                        "${model.data![i].date}",
-                        style: TextStyle(
-                            color: AppColor().colorPrimary(),
-                            fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                // Padding(
-                //   padding: const EdgeInsets.only(top: 8.0, bottom: 8),
-                //   child: DottedLine(
-                //     // direction: Axis.horizontal,
-                //     lineLength: 320,
-                //     lineThickness: 1.0,
-                //     dashLength: 4.0,
-                //     dashColor: AppColor().colorPrimary(),
-                //     // dashGradient: [Colors.red, Colors.blue],
-                //     dashRadius: 0.0,
-                //     dashGapLength: 4.0,
-                //     dashGapColor: Colors.transparent,
-                //     // dashGapGradient: [Colors.red, Colors.blue],
-                //     dashGapRadius: 0.0,
-                //   ),
-                // ),
-                Container(
-                  height: 60,
-                  width: MediaQuery.of(context).size.width,
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Card(
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)),
+                child: Container(
+                  // padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                      color: AppColor().colorPrimary(),
-                      borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(12),
-                          bottomRight: Radius.circular(12))),
+                    border: Border.all(color: AppColor.PrimaryDark),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      model.data![i].status == "1"
-                          ? Padding(
-                              padding: const EdgeInsets.only(top: 7.0),
-                              child: Center(
-                                child: ElevatedButton(
-                                    onPressed: () {
-                                      //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                        primary: Colors.green,
-                                        fixedSize: Size(140, 35),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        )),
-                                    child: Text(
-                                      "Accepted",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w400),
-                                    )),
-                              ),
-                            )
-                          : model.data![i].status == "2"
+                      Padding(
+                        padding: EdgeInsets.only(
+                            top: 12.0, bottom: 8, left: 15, right: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Name",
+                              style: TextStyle(
+                                  color: AppColor().colorPrimary(),
+                                  fontWeight: FontWeight.normal),
+                            ),
+                            Text(
+                              "${model.data![i].username}",
+                              style: TextStyle(
+                                  color: AppColor().colorPrimary(),
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // ListView.builder(
+                      //   itemCount: model.data![i].products!.length,
+                      //     itemBuilder: (context, index){
+                      //   return
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            top: 4.0, bottom: 4, left: 15, right: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Job",
+                              style: TextStyle(
+                                  color: AppColor().colorPrimary(),
+                                  fontWeight: FontWeight.normal),
+                            ),
+                            Text(
+                              "${model.data![i].products![0].artistName}",
+                              // maxLines: 2,
+                              style: TextStyle(
+                                  color: AppColor().colorPrimary(),
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            top: 4.0, bottom: 4, left: 15, right: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Amount",
+                              style: TextStyle(
+                                  color: AppColor().colorPrimary(),
+                                  fontWeight: FontWeight.normal),
+                            ),
+                            Text(
+                              "₹ ${model.data![i].subtotal}",
+                              style: TextStyle(
+                                  color: AppColor().colorPrimary(),
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            top: 4.0, bottom: 4, left: 15, right: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Date",
+                              style: TextStyle(
+                                  color: AppColor().colorPrimary(),
+                                  fontWeight: FontWeight.normal),
+                            ),
+                            Text(
+                              "${model.data![i].date}",
+                              style: TextStyle(
+                                  color: AppColor().colorPrimary(),
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(top: 8.0, bottom: 8),
+                      //   child: DottedLine(
+                      //     // direction: Axis.horizontal,
+                      //     lineLength: 320,
+                      //     lineThickness: 1.0,
+                      //     dashLength: 4.0,
+                      //     dashColor: AppColor().colorPrimary(),
+                      //     // dashGradient: [Colors.red, Colors.blue],
+                      //     dashRadius: 0.0,
+                      //     dashGapLength: 4.0,
+                      //     dashGapColor: Colors.transparent,
+                      //     // dashGapGradient: [Colors.red, Colors.blue],
+                      //     dashGapRadius: 0.0,
+                      //   ),
+                      // ),
+                      Container(
+                        height: 60,
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                            color: AppColor().colorPrimary(),
+                            borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(12),
+                                bottomRight: Radius.circular(12))),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            model.data![i].status == "1"
+                                ? Padding(
+                                    padding: const EdgeInsets.only(top: 7.0),
+                                    child: Center(
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          primary: Colors.green,
+                                          fixedSize: Size(140, 35),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          "Accepted",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                 :model.data![i].status == "2"
+                                    ? Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 7.0),
+                                        child: Center(
+                                          child: ElevatedButton(
+                                              onPressed: () {
+                                                //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                  primary: Colors.green,
+                                                  fixedSize: Size(140, 35),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                  ),
+                                              ),
+                                              child: Text(
+                                                "Start",
+                                                style: TextStyle(fontWeight: FontWeight.w400),
+                                              ),
+                                          ),
+                                        ),
+                                      ):model.data![i].status == "3"
+                                        ? Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 7.0),
+                                            child: Center(
+                                              child: ElevatedButton(
+                                                  onPressed: () {
+                                                    //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          primary: Colors.green,
+                                                          fixedSize:
+                                                              Size(140, 35),
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                          ),
+                                                      ),
+                                                  child: Text(
+                                                    "Completed",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w400),
+                                                  ),
+                                              ),
+                                            ),
+                                          )
+                                        : model.data![i].status == "4"
+                                            ? Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 7.0),
+                                                child: ElevatedButton(
+                                                    onPressed: () {
+                                                      updateFoodOrderStatus(
+                                                          "${model.data![i].bookingId.toString()}",
+                                                          "4");
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                            primary: Colors.red,
+                                                            fixedSize:
+                                                                Size(140, 35),
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                            )),
+                                                    child: Text(
+                                                      "Declined",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w400),
+                                                    )),
+                                              )
+                                            : Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  ElevatedButton(
+                                                      onPressed: () {
+                                                        updateFoodOrderStatus(
+                                                            "${model.data![i].bookingId.toString()}",
+                                                            "1");
+                                                        if (type == "1" ||
+                                                            type == "8") {
+                                                          getFoodOrders();
+                                                        } else {
+                                                          getVendorBooking();
+                                                        }
+                                                      },
+                                                      style: ElevatedButton.styleFrom(
+                                                          primary: Colors.green,
+                                                          fixedSize:
+                                                              Size(140, 35),
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10))),
+                                                      child: Text("Accept",
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400))),
+                                                  const SizedBox(
+                                                    width: 15,
+                                                  ),
+                                                  ElevatedButton(
+                                                      onPressed: () {
+                                                        updateFoodOrderStatus(
+                                                            "${model.data![i].bookingId.toString()}",
+                                                            "4");
+                                                        if (type == "1" ||
+                                                            type == "8") {
+                                                          getFoodOrders();
+                                                        } else {
+                                                          getVendorBooking();
+                                                        }
+                                                      },
+                                                      style: ElevatedButton.styleFrom(
+                                                          primary: Colors.red,
+                                                          fixedSize:
+                                                              Size(140, 35),
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10))),
+                                                      child: Text("Decline",
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight.w400),
+                                                      ),
+                                                  ),
+                                                ],
+                                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+         :Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              child: Container(
+                // padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColor.PrimaryDark),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                          top: 12.0, bottom: 8, left: 15, right: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Name",
+                            style: TextStyle(
+                                color: AppColor().colorPrimary(),
+                                fontWeight: FontWeight.normal),
+                          ),
+                          Text(
+                            "${model.data![i].username}",
+                            style: TextStyle(
+                                color: AppColor().colorPrimary(),
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                    ),
+                    // ListView.builder(
+                    //   itemCount: model.data![i].products!.length,
+                    //     itemBuilder: (context, index){
+                    //   return
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top: 4.0, bottom: 4, left: 15, right: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Job",
+                            style: TextStyle(
+                                color: AppColor().colorPrimary(),
+                                fontWeight: FontWeight.normal),
+                          ),
+                          Text(
+                            "${model.data![i].products![0].artistName}",
+                            // maxLines: 2,
+                            style: TextStyle(
+                                color: AppColor().colorPrimary(),
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // ;
+                    //            }),
+
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top: 4.0, bottom: 4, left: 15, right: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Amounted",
+                            style: TextStyle(
+                                color: AppColor().colorPrimary(),
+                                fontWeight: FontWeight.normal),
+                          ),
+                          Text(
+                            "₹ ${model.data![i].subtotal}",
+                            style: TextStyle(
+                                color: AppColor().colorPrimary(),
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top: 4.0, bottom: 4, left: 15, right: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Date",
+                            style: TextStyle(
+                                color: AppColor().colorPrimary(),
+                                fontWeight: FontWeight.normal),
+                          ),
+                          Text(
+                            "${model.data![i].date}",
+                            style: TextStyle(
+                                color: AppColor().colorPrimary(),
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top: 8.0, bottom: 8),
+                    //   child: DottedLine(
+                    //     // direction: Axis.horizontal,
+                    //     lineLength: 320,
+                    //     lineThickness: 1.0,
+                    //     dashLength: 4.0,
+                    //     dashColor: AppColor().colorPrimary(),
+                    //     // dashGradient: [Colors.red, Colors.blue],
+                    //     dashRadius: 0.0,
+                    //     dashGapLength: 4.0,
+                    //     dashGapColor: Colors.transparent,
+                    //     // dashGapGradient: [Colors.red, Colors.blue],
+                    //     dashGapRadius: 0.0,
+                    //   ),
+                    // ),
+                    Container(
+                      height: 60,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                          color: AppColor().colorPrimary(),
+                          borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(12),
+                              bottomRight: Radius.circular(12))),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          model.data![i].status == "1"
                               ? Padding(
                                   padding: const EdgeInsets.only(top: 7.0),
                                   child: Center(
@@ -922,13 +1246,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   BorderRadius.circular(10),
                                             )),
                                         child: Text(
-                                          "Start",
+                                          "Accepted",
                                           style: TextStyle(
                                               fontWeight: FontWeight.w400),
                                         )),
                                   ),
                                 )
-                              : model.data![i].status == "3"
+                              : model.data![i].status == "2"
                                   ? Padding(
                                       padding: const EdgeInsets.only(top: 7.0),
                                       child: Center(
@@ -944,407 +1268,149 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       BorderRadius.circular(10),
                                                 )),
                                             child: Text(
-                                              "Completed",
+                                              "Start",
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w400),
                                             )),
                                       ),
                                     )
-                                  : model.data![i].status == "4"
+                                  : model.data![i].status == "3"
                                       ? Padding(
                                           padding:
                                               const EdgeInsets.only(top: 7.0),
-                                          child: ElevatedButton(
+                                          child: Center(
+                                            child: ElevatedButton(
                                               onPressed: () {
-                                                updateFoodOrderStatus(
-                                                    "${model.data![i].bookingId.toString()}",
-                                                    "4");
+                                                //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
                                               },
                                               style: ElevatedButton.styleFrom(
-                                                  primary: Colors.red,
-                                                  fixedSize: Size(140, 35),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  )),
+                                                primary: Colors.green,
+                                                fixedSize: Size(140, 35),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                              ),
                                               child: Text(
-                                                "Declined",
+                                                "Completed",
                                                 style: TextStyle(
                                                     fontWeight:
                                                         FontWeight.w400),
-                                              )),
-                                        )
-                                      : Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            ElevatedButton(
-                                                onPressed: () {
-                                                  updateFoodOrderStatus(
-                                                      "${model.data![i].bookingId.toString()}",
-                                                      "1");
-                                                  if (type == "1" || type == "8") {
-                                                    getFoodOrders();
-                                                  } else {
-                                                    getVendorBooking();
-                                                  }
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                    primary: Colors.green,
-                                                    fixedSize: Size(140, 35),
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                    )),
-                                                child: Text(
-                                                  "Accept",
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w400),
-                                                )),
-                                            const SizedBox(
-                                              width: 15,
+                                              ),
                                             ),
-                                            ElevatedButton(
-                                                onPressed: () {
-                                                  updateFoodOrderStatus(
-                                                      "${model.data![i].bookingId.toString()}",
-                                                      "4");
-                                                  if (type == "1" || type == "8") {
-                                                    getFoodOrders();
-                                                  } else {
-                                                    getVendorBooking();
-                                                  }
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                    primary: Colors.red,
-                                                    fixedSize: Size(140, 35),
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
+                                          ),
+                                        )
+                                      : model.data![i].status == "4"
+                                          ? Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 7.0),
+                                              child: ElevatedButton(
+                                                  onPressed: () {
+                                                    updateFoodOrderStatus(
+                                                        "${model.data![i].bookingId.toString()}",
+                                                        "4");
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          primary: Colors.red,
+                                                          fixedSize:
+                                                              Size(140, 35),
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                          )),
+                                                  child: Text(
+                                                    "Declined",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w400),
+                                                  ),
+                                              ),
+                                            )
+                                          : Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                ElevatedButton(
+                                                    onPressed: () {
+                                                      print('type----------${type}');
+                                                      updateFoodOrderStatus(
+                                                          "${model.data![i].bookingId.toString()}",
+                                                          "1");
+                                                      if (type == "1" ||
+                                                          type == "8") {
+                                                        getFoodOrders();
+                                                      } else {
+                                                        getVendorBooking();
+                                                      }
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                            primary:
+                                                                Colors.green,
+                                                            fixedSize:
+                                                                Size(140, 35),
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                            )),
+                                                    child: Text(
+                                                      "Accept",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w400),
                                                     )),
-                                                child: Text(
-                                                  "Decline",
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w400),
-                                                ))
-                                          ],
-                                        ),
-                    ],
-                  ),
+                                                const SizedBox(
+                                                  width: 15,
+                                                ),
+                                                ElevatedButton(
+                                                    onPressed: () {
+                                                      updateFoodOrderStatus(
+                                                          "${model.data![i].bookingId.toString()}",
+                                                          "4");
+                                                      if (type == "1" ||
+                                                          type == "8") {
+                                                        getFoodOrders();
+                                                      } else {
+                                                        getVendorBooking();
+                                                      }
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                            primary: Colors.red,
+                                                            fixedSize:
+                                                                Size(140, 35),
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                            )),
+                                                    child: Text(
+                                                      "Decline",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w400),
+                                                    ))
+                                              ],
+                                            ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    ):
-    Padding(
-    padding: const EdgeInsets.all(4.0),
-    child: Card(
-    elevation: 5,
-    shape:
-    RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-    child: Container(
-    // padding: EdgeInsets.all(12),
-    decoration: BoxDecoration(
-    border: Border.all(color: AppColor.PrimaryDark),
-    borderRadius: BorderRadius.circular(15),
-    ),
-    child: Column(
-    children: [
-    Padding(
-    padding:  EdgeInsets.only(
-    top: 12.0, bottom: 8, left: 15, right: 15),
-    child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-    Text(
-    "Name",
-    style: TextStyle(
-    color: AppColor().colorPrimary(),
-    fontWeight: FontWeight.normal),
-    ),
-    Text(
-    "${model.data![i].username}",
-    style: TextStyle(
-    color: AppColor().colorPrimary(),
-    fontWeight: FontWeight.bold),
-    )
-    ],
-    ),
-    ),
-    // ListView.builder(
-    //   itemCount: model.data![i].products!.length,
-    //     itemBuilder: (context, index){
-    //   return
-    Padding(
-    padding: const EdgeInsets.only(
-    top: 4.0, bottom: 4, left: 15, right: 15),
-    child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-    Text(
-    "Job",
-    style: TextStyle(
-    color: AppColor().colorPrimary(),
-    fontWeight: FontWeight.normal),
-    ),
-    Text(
-    "${model.data![i].products![0].artistName}",
-    // maxLines: 2,
-    style: TextStyle(
-    color: AppColor().colorPrimary(),
-    fontWeight: FontWeight.w600),
-    ),
-    ],
-    ),
-    ),
-    // ;
-    //            }),
-
-    Padding(
-    padding: const EdgeInsets.only(
-    top: 4.0, bottom: 4, left: 15, right: 15),
-    child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-    Text(
-    "Amount",
-    style: TextStyle(
-    color: AppColor().colorPrimary(),
-    fontWeight: FontWeight.normal),
-    ),
-    Text(
-    "₹ ${model.data![i].subtotal}",
-    style: TextStyle(
-    color: AppColor().colorPrimary(),
-    fontWeight: FontWeight.w600),
-    )
-    ],
-    ),
-    ),
-    Padding(
-    padding: const EdgeInsets.only(
-    top: 4.0, bottom: 4, left: 15, right: 15),
-    child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-    Text(
-    "Date",
-    style: TextStyle(
-    color: AppColor().colorPrimary(),
-    fontWeight: FontWeight.normal),
-    ),
-    Text(
-    "${model.data![i].date}",
-    style: TextStyle(
-    color: AppColor().colorPrimary(),
-    fontWeight: FontWeight.w600),
-    )
-    ],
-    ),
-    ),
-    SizedBox(
-    height: 10,
-    ),
-    // Padding(
-    //   padding: const EdgeInsets.only(top: 8.0, bottom: 8),
-    //   child: DottedLine(
-    //     // direction: Axis.horizontal,
-    //     lineLength: 320,
-    //     lineThickness: 1.0,
-    //     dashLength: 4.0,
-    //     dashColor: AppColor().colorPrimary(),
-    //     // dashGradient: [Colors.red, Colors.blue],
-    //     dashRadius: 0.0,
-    //     dashGapLength: 4.0,
-    //     dashGapColor: Colors.transparent,
-    //     // dashGapGradient: [Colors.red, Colors.blue],
-    //     dashGapRadius: 0.0,
-    //   ),
-    // ),
-    Container(
-    height: 60,
-    width: MediaQuery.of(context).size.width,
-    decoration: BoxDecoration(
-    color: AppColor().colorPrimary(),
-    borderRadius: BorderRadius.only(
-    bottomLeft: Radius.circular(12),
-    bottomRight: Radius.circular(12))),
-    child: Column(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-    model.data![i].status == "1"
-    ? Padding(
-    padding: const EdgeInsets.only(top: 7.0),
-    child: Center(
-    child: ElevatedButton(
-    onPressed: () {
-    //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
-    },
-    style: ElevatedButton.styleFrom(
-    primary: Colors.green,
-    fixedSize: Size(140, 35),
-    shape: RoundedRectangleBorder(
-    borderRadius:
-    BorderRadius.circular(10),
-    )),
-    child: Text(
-    "Accepted",
-    style: TextStyle(
-    fontWeight: FontWeight.w400),
-    )),
-    ),
-    )
-        : model.data![i].status == "2"
-    ? Padding(
-    padding: const EdgeInsets.only(top: 7.0),
-    child: Center(
-    child: ElevatedButton(
-    onPressed: () {
-    //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
-    },
-    style: ElevatedButton.styleFrom(
-    primary: Colors.green,
-    fixedSize: Size(140, 35),
-    shape: RoundedRectangleBorder(
-    borderRadius:
-    BorderRadius.circular(10),
-    )),
-    child: Text(
-    "Start",
-    style: TextStyle(
-    fontWeight: FontWeight.w400),
-    )),
-    ),
-    )
-        : model.data![i].status == "3"
-    ? Padding(
-    padding: const EdgeInsets.only(top: 7.0),
-    child: Center(
-    child: ElevatedButton(
-    onPressed: () {
-    //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
-    },
-    style: ElevatedButton.styleFrom(
-    primary: Colors.green,
-    fixedSize: Size(140, 35),
-    shape: RoundedRectangleBorder(
-    borderRadius:
-    BorderRadius.circular(10),
-    )),
-    child: Text(
-    "Completed",
-    style: TextStyle(
-    fontWeight: FontWeight.w400),
-    )),
-    ),
-    )
-        : model.data![i].status == "4"
-    ? Padding(
-    padding:
-    const EdgeInsets.only(top: 7.0),
-    child: ElevatedButton(
-    onPressed: () {
-    updateFoodOrderStatus(
-    "${model.data![i].bookingId.toString()}",
-    "4");
-    },
-    style: ElevatedButton.styleFrom(
-    primary: Colors.red,
-    fixedSize: Size(140, 35),
-    shape: RoundedRectangleBorder(
-    borderRadius:
-    BorderRadius.circular(
-    10),
-    )),
-    child: Text(
-    "Declined",
-    style: TextStyle(
-    fontWeight:
-    FontWeight.w400),
-    )),
-    )
-        : Row(
-    mainAxisAlignment:
-    MainAxisAlignment.center,
-    crossAxisAlignment:
-    CrossAxisAlignment.center,
-    children: [
-    ElevatedButton(
-    onPressed: () {
-    updateFoodOrderStatus(
-    "${model.data![i].bookingId.toString()}",
-    "1");
-    if (type == "1" || type == "8") {
-    getFoodOrders();
-    } else {
-    getVendorBooking();
-    }
-    },
-    style: ElevatedButton.styleFrom(
-    primary: Colors.green,
-    fixedSize: Size(140, 35),
-    shape:
-    RoundedRectangleBorder(
-    borderRadius:
-    BorderRadius.circular(
-    10),
-    )),
-    child: Text(
-    "Accept",
-    style: TextStyle(
-    fontWeight:
-    FontWeight.w400),
-    )),
-    const SizedBox(
-    width: 15,
-    ),
-    ElevatedButton(
-    onPressed: () {
-    updateFoodOrderStatus(
-    "${model.data![i].bookingId.toString()}",
-    "4");
-    if (type == "1" || type == "8") {
-    getFoodOrders();
-    } else {
-    getVendorBooking();
-    }
-    },
-    style: ElevatedButton.styleFrom(
-    primary: Colors.red,
-    fixedSize: Size(140, 35),
-    shape:
-    RoundedRectangleBorder(
-    borderRadius:
-    BorderRadius.circular(
-    10),
-    )),
-    child: Text(
-    "Decline",
-    style: TextStyle(
-    fontWeight:
-    FontWeight.w400),
-    ))
-    ],
-    ),
-    ],
-    ),
-    ),
-    ],
-    ),
-    ),
-    ),
-    );
+          );
   }
 
   cardWidgetDelivery(ParcelModel model) {
@@ -1355,12 +1421,12 @@ class _HomeScreenState extends State<HomeScreen> {
         //   Navigator.push(context, MaterialPageRoute(builder: (context)=>  OfflinePage("")));
         // } else{
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => DeliveryDetails(
-                      data: model,
-                    ),
+          context,
+          MaterialPageRoute(
+            builder: (context) => DeliveryDetails(
+              data: model,
             ),
+          ),
         );
         // }
       },
@@ -1379,7 +1445,8 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 12.0, left: 15, right: 15),
+                  padding:
+                      const EdgeInsets.only(top: 12.0, left: 15, right: 15),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -2439,7 +2506,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   thickness: 1,
                   color: AppColor().colorBg1(),
                 ),
-              ), //DrawerHeader
+              ),
+              //DrawerHeader
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(40),
@@ -2509,8 +2577,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         //   Navigator.push(context, MaterialPageRoute(builder: (context) => BottomBarDelivery()));
                         // }
                       },
-                     ),
-                  type == "2" || type == "3" || type == "4"
+                    ),
+              type == "2" || type == "3" || type == "4"
                   ? SizedBox.shrink()
                   : ListTile(
                       // leading: Icon(Icons.bookmark_border),
@@ -2545,36 +2613,33 @@ class _HomeScreenState extends State<HomeScreen> {
               type == "2" || type == "3" || type == "4"
                   ? SizedBox.shrink()
                   : ListTile(
-                // leading: Icon(Icons.bookmark_border),
-                leading: Image.asset(
-                  "images/icons/booking.png",
-                  color: Colors.white,
-                  height: 25,
-                  width: 25,
-                ),
-                // leading: const ImageIcon(AssetImage("assets/Icons/Wallet1.png")),
-                title: const Text(
-                  'My Request Service',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500),
-                ),
-                onTap: () {
-                  // if(type =="1" ){
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              RequestserviceScreen()
-                      )
-                  );
-                  // } else{
-                  //   Navigator.push(context, MaterialPageRoute(builder: (context) => BottomBarDelivery()));
-                  // }
-                },
-              ),
-               ListTile(
+                      // leading: Icon(Icons.bookmark_border),
+                      leading: Image.asset(
+                        "images/icons/booking.png",
+                        color: Colors.white,
+                        height: 25,
+                        width: 25,
+                      ),
+                      // leading: const ImageIcon(AssetImage("assets/Icons/Wallet1.png")),
+                      title: const Text(
+                        'My Request Service',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      onTap: () {
+                        // if(type =="1" ){
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RequestserviceScreen()));
+                        // } else{
+                        //   Navigator.push(context, MaterialPageRoute(builder: (context) => BottomBarDelivery()));
+                        // }
+                      },
+                    ),
+              ListTile(
                 // leading: Icon(Icons.my_library_add),
                 leading: Image.asset(
                   "images/icons/completejobs.png",
@@ -2583,7 +2648,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 25,
                 ),
                 // leading: const ImageIcon(AssetImage("assets/Icons/Wallet1.png")),
-                title: Text(type == "1" ? 'Completed Services' : 'Completed Services',
+                title: Text(
+                    type == "1" ? 'Completed Services' : 'Completed Services',
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -2596,28 +2662,28 @@ class _HomeScreenState extends State<HomeScreen> {
                               ManageService(isIcon: true, index: 1)));
                 },
               ),
-         // type == "7" ?  ListTile(
-         //        // leading: Icon(Icons.bookmark_border),
-         //        leading: Image.asset(
-         //          "images/icons/rating.png",
-         //          height: 25,
-         //          width: 25,
-         //        ),
-         //        // leading: const ImageIcon(AssetImage("assets/Icons/Events.png")),
-         //        title: const Text('Plans',
-         //            style: TextStyle(
-         //                color: Colors.white,
-         //                fontSize: 18,
-         //                fontWeight: FontWeight.w500)),
-         //        onTap: () {
-         //          Navigator.push(
-         //            context,
-         //            // MaterialPageRoute(builder: (context) => ChatPage( chatId: "1", title: "Karan")),
-         //            MaterialPageRoute(builder: (context)=> AddPlans()),
-         //          );
-         //        },
-         //      ) : SizedBox.shrink()
-         //      ,
+              // type == "7" ?  ListTile(
+              //        // leading: Icon(Icons.bookmark_border),
+              //        leading: Image.asset(
+              //          "images/icons/rating.png",
+              //          height: 25,
+              //          width: 25,
+              //        ),
+              //        // leading: const ImageIcon(AssetImage("assets/Icons/Events.png")),
+              //        title: const Text('Plans',
+              //            style: TextStyle(
+              //                color: Colors.white,
+              //                fontSize: 18,
+              //                fontWeight: FontWeight.w500)),
+              //        onTap: () {
+              //          Navigator.push(
+              //            context,
+              //            // MaterialPageRoute(builder: (context) => ChatPage( chatId: "1", title: "Karan")),
+              //            MaterialPageRoute(builder: (context)=> AddPlans()),
+              //          );
+              //        },
+              //      ) : SizedBox.shrink()
+              //      ,
               // ListTile(
               //   // leading: Icon(Icons.bookmark_border),
               //   leading: Image.asset(
@@ -2942,7 +3008,8 @@ class _HomeScreenState extends State<HomeScreen> {
               )
             ],
           ),
-        ));
+        ),
+    );
   }
 
   Widget _banner(BuildContext context) {
@@ -3173,6 +3240,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   String? token;
+
   getToken() async {
     token = await FirebaseMessaging.instance.getToken();
   }
@@ -3280,7 +3348,6 @@ class _HomeScreenState extends State<HomeScreen> {
         deliveryModel = result.rides;
         isRide = true;
       });
-
     } else {
       return null;
     }
@@ -3295,7 +3362,8 @@ class _HomeScreenState extends State<HomeScreen> {
     request.fields.addAll({
       'booking_id': '${id.toString()}',
     });
-    print("this is our food delivery request =====>>>>> ${request.fields.toString()}");
+    print(
+        "this is our food delivery request =====>>>>> ${request.fields.toString()}");
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     print("this food delivery response @@ ${response.statusCode}");
@@ -3309,6 +3377,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   String? currentAddress;
+
   Future _refresh() async {
     return callApi();
   }
@@ -3337,41 +3406,41 @@ class _HomeScreenState extends State<HomeScreen> {
     getVendorBooking();
     PushNotificationService notificationService = new PushNotificationService(
       context: context,
-        // onResult: (result) async{
-        //   print("boook " + result.toString());
-        //   if (result != null) {
-        //     var id = result;
-        //     // deliveryType = result.type;
-        //     await getFoodDeliveryBooking(id);
-        //     await getDeliverRideBooking(id);
-        //     Future.delayed(Duration(
-        //       seconds: 1
-        //     ),
-        //         (){
-        //       Navigator.push(context, MaterialPageRoute(builder: (context)=> HomeScreen()));
-        //         });
-        //     // if(type =="Food"){
-        //     //   setState((){
-        //
-        //         // Future.delayed(Duration(
-        //         //   seconds: 2
-        //         // ),(){
-        //         //   _refresh();
-        //         // });
-        //       // });
-        //     // }
-        //     // else {
-        //     //   // getDeliverRideBooking(id, type);
-        //     // }
-        //   // if(result != null){
-        //   //   if (result == "yes") {
-        //   //     // registerToken();
-        //   //   }
-        //   //   else {
-        //   //     // getDeliverRideBooking(result);
-        //   //   }
-        //   }
-        // },
+      // onResult: (result) async{
+      //   print("boook " + result.toString());
+      //   if (result != null) {
+      //     var id = result;
+      //     // deliveryType = result.type;
+      //     await getFoodDeliveryBooking(id);
+      //     await getDeliverRideBooking(id);
+      //     Future.delayed(Duration(
+      //       seconds: 1
+      //     ),
+      //         (){
+      //       Navigator.push(context, MaterialPageRoute(builder: (context)=> HomeScreen()));
+      //         });
+      //     // if(type =="Food"){
+      //     //   setState((){
+      //
+      //         // Future.delayed(Duration(
+      //         //   seconds: 2
+      //         // ),(){
+      //         //   _refresh();
+      //         // });
+      //       // });
+      //     // }
+      //     // else {
+      //     //   // getDeliverRideBooking(id, type);
+      //     // }
+      //   // if(result != null){
+      //   //   if (result == "yes") {
+      //   //     // registerToken();
+      //   //   }
+      //   //   else {
+      //   //     // getDeliverRideBooking(result);
+      //   //   }
+      //   }
+      // },
       // type: type
     );
     notificationService.initialise();
@@ -3387,6 +3456,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   LocationPermission? permission;
+
   Future getUserCurrentLocation() async {
     permission = await Geolocator.requestPermission();
     await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
@@ -3423,9 +3493,9 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
+
     return RefreshIndicator(
         // displacement: 250,
         color: AppColor().colorPrimary(),
@@ -3903,33 +3973,33 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               elevation: 0,
               title: Container(
-                  child: Row(
-                children: [
-                  Container(
-                    child: Icon(
-                      Icons.location_on,
-                      color: colors.whit,
+                child: Row(
+                  children: [
+                    Container(
+                      child: Icon(
+                        Icons.location_on,
+                        color: colors.whit,
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Container(
-                    width: 170,
-                    child: Text(
-                      _currentAddress == "" || _currentAddress == null
-                          ? ""
-                          : "${_currentAddress.toString()}",
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      style: TextStyle(
-                          fontSize: 14,
-                          color: colors.whit,
-                          fontWeight: FontWeight.w400),
+                    SizedBox(
+                      width: 5,
                     ),
-                  ),
-                ],
-              ),
+                    Container(
+                      width: 170,
+                      child: Text(
+                        _currentAddress == "" || _currentAddress == null
+                            ? ""
+                            : "${_currentAddress.toString()}",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: colors.whit,
+                            fontWeight: FontWeight.w400),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               actions: [
                 InkWell(
@@ -3944,7 +4014,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         deliveryType = result.type;
                       });
                       print(
-                          "this is delivery type ---->> =====>>> ${bookingID.toString()}");
+                          "this is delivery type---->> =====>>> ${bookingID.toString()}");
                       // if (type == "1") {
                       //   await getFoodDeliveryBooking(bookingID);
                       // } else if (type == "2") {
@@ -3955,8 +4025,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       // Future.delayed(Duration(seconds: 2), () {
                       //   _refresh();
                       // });
-                    }
-                    else{
+                    } else {
                       print("not working");
                     }
                     // Navigator.push(context, MaterialPageRoute(builder:(context)=>NotificationScreen()));
@@ -3982,7 +4051,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         topRight: Radius.circular(45),
                       )),
                   child: Container(
-                     height: MediaQuery.of(context).size.height/1.2,
+                    height: MediaQuery.of(context).size.height / 1.2,
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
                         color: AppColor().colorBg1(),
@@ -3993,9 +4062,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8.0, right: 8),
                       child: ListView(
-                      //  crossAxisAlignment: CrossAxisAlignment.start,
+                        //  crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 20,),
+                          const SizedBox(
+                            height: 20,
+                          ),
                           // InkWell(
                           //   onTap: () {
                           //     // Navigator.push(
@@ -4060,6 +4131,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           //   ),
                           // ),
                           _banner(context),
+
                           /// Today offer section
                           // Padding(
                           //   padding: const EdgeInsets.all(8.0),
@@ -4263,462 +4335,489 @@ class _HomeScreenState extends State<HomeScreen> {
                           Padding(
                             padding: const EdgeInsets.only(
                                 left: 20.0, bottom: 8, top: 8),
-                            child: roles == "Tent House" ? Text("New Order", style: TextStyle(
-                              fontSize: 18,
-                              color: AppColor().colorPrimary(),
-                              fontWeight: FontWeight.w600,
-                            )) : Text(
-                                // roles != "Grocery"  ? "Today Jobs" :
-                                'New Booking',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: AppColor().colorPrimary(),
-                                  fontWeight: FontWeight.w600,
-                                )),
+                            child: roles == "Tent House"
+                                ? Text("New Order",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: AppColor().colorPrimary(),
+                                      fontWeight: FontWeight.w600,
+                                    ))
+                                : Text(
+                                    // roles != "Grocery"  ? "Today Jobs" :
+                                    'New Booking',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: AppColor().colorPrimary(),
+                                      fontWeight: FontWeight.w600,
+                                    )),
                           ),
-                       // type == "8"
-                       //        ? Padding(
-                       //            padding: const EdgeInsets.only(
-                       //                left: 8.0, right: 8),
-                       //            child: FutureBuilder(
-                       //                future: getFoodOrders(),
-                       //                builder: (BuildContext context,
-                       //                    AsyncSnapshot snapshot) {
-                       //                  if (snapshot.hasData) {
-                       //                    GetVendorOrderModel? model =
-                       //                        snapshot.data;
-                       //                    return model!.responseCode == "1"
-                       //                        ? ListView.builder(
-                       //                            shrinkWrap: true,
-                       //                            physics:
-                       //                                NeverScrollableScrollPhysics(),
-                       //                            itemCount:
-                       //                                model.orders!.length,
-                       //                            itemBuilder: (context, i) {
-                       //                              return cardWidget(model, i);
-                       //                            })
-                       //                        : Container(
-                       //                            height: 100,
-                       //                            child: Center(
-                       //                                child: Text(roles !=
-                       //                                        "Grocery" || roles != "Tent House"
-                       //                                    ? "No Jobs Found!!"
-                       //                                    : "No Orders Found!!")),
-                       //                          );
-                       //                  } else if (snapshot.hasError) {
-                       //                    return Icon(Icons.error_outline);
-                       //                  } else {
-                       //                    return Container(
-                       //                        height: MediaQuery.of(context)
-                       //                                .size
-                       //                                .height /
-                       //                            1.5,
-                       //                        child: Center(
-                       //                            child:
-                       //                                CircularProgressIndicator(
-                       //                          color:
-                       //                              AppColor().colorPrimary(),
-                       //                        )));
-                       //                  }
-                       //                }),
-                       //          )
-                       //
-                       //        :
-                       type == "5" || type == "6" || type == "7" || type == "1" || type == "8" ?
-                          FutureBuilder(
-                                      future: getVendorBooking(),
-                                      builder: (BuildContext context,
-                                          AsyncSnapshot snapshot) {
-                                          print("snap shot has data here ${snapshot.data} and ${snapshot.hasData}");
-                                        if (snapshot.hasData) {
-                                          VendorBookingModel model =
-                                              snapshot.data;
-                                          print("response code here ${model.responseCode}");
-                                          return model.responseCode == "1"
-                                              ? Container(
-                                                  decoration: BoxDecoration(
+                          // type == "8"
+                          //        ? Padding(
+                          //            padding: const EdgeInsets.only(
+                          //                left: 8.0, right: 8),
+                          //            child: FutureBuilder(
+                          //                future: getFoodOrders(),
+                          //                builder: (BuildContext context,
+                          //                    AsyncSnapshot snapshot) {
+                          //                  if (snapshot.hasData) {
+                          //                    GetVendorOrderModel? model =
+                          //                        snapshot.data;
+                          //                    return model!.responseCode == "1"
+                          //                        ? ListView.builder(
+                          //                            shrinkWrap: true,
+                          //                            physics:
+                          //                                NeverScrollableScrollPhysics(),
+                          //                            itemCount:
+                          //                                model.orders!.length,
+                          //                            itemBuilder: (context, i) {
+                          //                              return cardWidget(model, i);
+                          //                            })
+                          //                        : Container(
+                          //                            height: 100,
+                          //                            child: Center(
+                          //                                child: Text(roles !=
+                          //                                        "Grocery" || roles != "Tent House"
+                          //                                    ? "No Jobs Found!!"
+                          //                                    : "No Orders Found!!")),
+                          //                          );
+                          //                  } else if (snapshot.hasError) {
+                          //                    return Icon(Icons.error_outline);
+                          //                  } else {
+                          //                    return Container(
+                          //                        height: MediaQuery.of(context)
+                          //                                .size
+                          //                                .height /
+                          //                            1.5,
+                          //                        child: Center(
+                          //                            child:
+                          //                                CircularProgressIndicator(
+                          //                          color:
+                          //                              AppColor().colorPrimary(),
+                          //                        )));
+                          //                  }
+                          //                }),
+                          //          )
+                          //
+                          //        :
+                          type == "5" ||
+                                  type == "6" ||
+                                  type == "7" ||
+                                  type == "1" ||
+                                  type == "8"
+                              ? FutureBuilder(
+                                  future: getVendorBooking(),
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot snapshot) {
+                                    print(
+                                        "snap shot has data here ${snapshot.data} and ${snapshot.hasData}");
+                                    if (snapshot.hasData) {
+                                      VendorBookingModel model = snapshot.data;
+                                      print(
+                                          "response code here ${model.responseCode}");
+                                      return model.responseCode == "1"
+                                          ? Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              ),
+                                              child: ListView.builder(
+                                                  shrinkWrap: true,
+                                                  physics:
+                                                      NeverScrollableScrollPhysics(),
+                                                  itemCount: model.data!.length,
+                                                  itemBuilder: (context, i) {
+                                                    return cardWidget1(
+                                                        model, i);
+                                                  }),
+                                            )
+                                          : Container(
+                                              height: 100,
+                                              child: Center(
+                                                  child: Text(roles != "Food"
+                                                      ? "No Jobs Found!!"
+                                                      : "No Orders Found!!")),
+                                            );
+                                    } else if (snapshot.hasError) {
+                                      return Icon(Icons.error_outline);
+                                    } else {
+                                      return Container(
+                                        height:
+                                            MediaQuery.of(context).size.height /
+                                                1.5,
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            color: AppColor().colorPrimary(),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  })
+                              : type == "2" || type == "3" || type == "4"
+                                  ? deliveryType == "Food"
+                                      ? foodDeliveryModel != null
+                                          ? InkWell(
+                                              onTap: () {
+                                                // model.rides![i].type
+                                                // if(model.order![i].bookingsType == "ride_booking") {
+                                                //   Navigator.push(context, MaterialPageRoute(builder: (context)=>  OfflinePage("")));
+                                                // } else{
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        OrderFoodDelivery(
+                                                      data: foodDeliveryModel,
+                                                    ),
+                                                  ),
+                                                );
+                                                // }
+                                              },
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(4.0),
+                                                child: Card(
+                                                  elevation: 5,
+                                                  shape: RoundedRectangleBorder(
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                              20),
+                                                              15)),
+                                                  child: Container(
+                                                    // padding: EdgeInsets.all(12),
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: AppColor
+                                                              .PrimaryDark),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              15),
+                                                    ),
+                                                    child: Column(
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  top: 12.0,
+                                                                  left: 15,
+                                                                  right: 15),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Text(
+                                                                "Name",
+                                                                style: TextStyle(
+                                                                    color: AppColor()
+                                                                        .colorPrimary(),
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal),
+                                                              ),
+                                                              Text(
+                                                                "${foodDeliveryModel!.username}",
+                                                                style: TextStyle(
+                                                                    color: AppColor()
+                                                                        .colorPrimary(),
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  top: 4.0,
+                                                                  bottom: 4,
+                                                                  left: 15,
+                                                                  right: 15),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Text(
+                                                                "Date",
+                                                                style: TextStyle(
+                                                                    color: AppColor()
+                                                                        .colorPrimary(),
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal),
+                                                              ),
+                                                              Text(
+                                                                "${foodDeliveryModel!.date}",
+                                                                style: TextStyle(
+                                                                    color: AppColor()
+                                                                        .colorPrimary(),
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  top: 4.0,
+                                                                  bottom: 4,
+                                                                  left: 15,
+                                                                  right: 15),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                "Address",
+                                                                style: TextStyle(
+                                                                    color: AppColor()
+                                                                        .colorPrimary(),
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal),
+                                                              ),
+                                                              Container(
+                                                                width: 180,
+                                                                child: Text(
+                                                                  "${foodDeliveryModel!.deliveryAddress}",
+                                                                  maxLines: 2,
+                                                                  style: TextStyle(
+                                                                      color: AppColor()
+                                                                          .colorPrimary(),
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis),
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  top: 4.0,
+                                                                  bottom: 4,
+                                                                  left: 15,
+                                                                  right: 15),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Text(
+                                                                "Amount",
+                                                                style: TextStyle(
+                                                                    color: AppColor()
+                                                                        .colorPrimary(),
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal),
+                                                              ),
+                                                              Text(
+                                                                "₹ ${foodDeliveryModel!.total}",
+                                                                style: TextStyle(
+                                                                    color: AppColor()
+                                                                        .colorPrimary(),
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        // Padding(
+                                                        //   padding: const EdgeInsets.only(top: 8.0, bottom: 8),
+                                                        //   child: DottedLine(
+                                                        //     // direction: Axis.horizontal,
+                                                        //     lineLength: 320,
+                                                        //     lineThickness: 1.0,
+                                                        //     dashLength: 4.0,
+                                                        //     dashColor: AppColor().colorPrimary(),
+                                                        //     // dashGradient: [Colors.red, Colors.blue],
+                                                        //     dashRadius: 0.0,
+                                                        //     dashGapLength: 4.0,
+                                                        //     dashGapColor: Colors.transparent,
+                                                        //     // dashGapGradient: [Colors.red, Colors.blue],
+                                                        //     dashGapRadius: 0.0,
+                                                        //   ),
+                                                        // ),
+                                                        Container(
+                                                          height: 60,
+                                                          width: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width,
+                                                          decoration: BoxDecoration(
+                                                              color: AppColor()
+                                                                  .colorPrimary(),
+                                                              borderRadius: BorderRadius.only(
+                                                                  bottomLeft: Radius
+                                                                      .circular(
+                                                                          12),
+                                                                  bottomRight: Radius
+                                                                      .circular(
+                                                                          12))),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              foodDeliveryModel!
+                                                                          .orderStatus ==
+                                                                      "3"
+                                                                  ? Padding(
+                                                                      padding: const EdgeInsets
+                                                                              .only(
+                                                                          top:
+                                                                              7.0),
+                                                                      child:
+                                                                          Center(
+                                                                        child: ElevatedButton(
+                                                                            onPressed: () {
+                                                                              //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
+                                                                            },
+                                                                            style: ElevatedButton.styleFrom(
+                                                                                primary: Colors.green,
+                                                                                fixedSize: Size(140, 35),
+                                                                                shape: RoundedRectangleBorder(
+                                                                                  borderRadius: BorderRadius.circular(10),
+                                                                                )),
+                                                                            child: Text(
+                                                                              "Delivered",
+                                                                              style: TextStyle(fontWeight: FontWeight.w400),
+                                                                            )),
+                                                                      ),
+                                                                    )
+                                                                  : foodDeliveryModel!
+                                                                              .orderStatus ==
+                                                                          "5"
+                                                                      ? Padding(
+                                                                          padding:
+                                                                              const EdgeInsets.only(top: 7.0),
+                                                                          child:
+                                                                              Center(
+                                                                            child: ElevatedButton(
+                                                                                onPressed: () {
+                                                                                  //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
+                                                                                },
+                                                                                style: ElevatedButton.styleFrom(
+                                                                                    primary: Colors.green,
+                                                                                    fixedSize: Size(140, 35),
+                                                                                    shape: RoundedRectangleBorder(
+                                                                                      borderRadius: BorderRadius.circular(10),
+                                                                                    )),
+                                                                                child: Text(
+                                                                                  "Accepted",
+                                                                                  style: TextStyle(fontWeight: FontWeight.w400),
+                                                                                )),
+                                                                          ),
+                                                                        )
+                                                                      : foodDeliveryModel!.orderStatus ==
+                                                                              "6"
+                                                                          ? Padding(
+                                                                              padding: const EdgeInsets.only(top: 7.0),
+                                                                              child: ElevatedButton(
+                                                                                  onPressed: () {
+                                                                                    // updateFoodOrderStatus(
+                                                                                    //     "${foodDeliveryModel!.orderId}", "4");
+                                                                                    // if(type =="1"){
+                                                                                    //   getFoodOrders();
+                                                                                    // }else{
+                                                                                    //   getVendorBooking();
+                                                                                    // }
+                                                                                  },
+                                                                                  style: ElevatedButton.styleFrom(
+                                                                                      primary: Colors.red,
+                                                                                      fixedSize: Size(140, 35),
+                                                                                      shape: RoundedRectangleBorder(
+                                                                                        borderRadius: BorderRadius.circular(10),
+                                                                                      )),
+                                                                                  child: Text(
+                                                                                    "Declined",
+                                                                                    style: TextStyle(fontWeight: FontWeight.w400),
+                                                                                  )),
+                                                                            )
+                                                                          : Row(
+                                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                                                              children: [
+                                                                                ElevatedButton(
+                                                                                    onPressed: () {
+                                                                                      updateFoodDeliveryStatus("${foodDeliveryModel!.orderId}", "5");
+                                                                                      // if(type =="1"){
+                                                                                      //   getFoodOrders();
+                                                                                      // }else{
+                                                                                      //   getVendorBooking();
+                                                                                      // }
+                                                                                    },
+                                                                                    style: ElevatedButton.styleFrom(
+                                                                                        primary: Colors.green,
+                                                                                        fixedSize: Size(140, 35),
+                                                                                        shape: RoundedRectangleBorder(
+                                                                                          borderRadius: BorderRadius.circular(10),
+                                                                                        )),
+                                                                                    child: Text(
+                                                                                      "Accept",
+                                                                                      style: TextStyle(fontWeight: FontWeight.w400),
+                                                                                    )),
+                                                                                const SizedBox(
+                                                                                  width: 15,
+                                                                                ),
+                                                                                ElevatedButton(
+                                                                                    onPressed: () {
+                                                                                      updateFoodDeliveryStatus("${foodDeliveryModel!.orderId}", "6");
+                                                                                      // if(type =="1"){
+                                                                                      //   getFoodOrders();
+                                                                                      // }else{
+                                                                                      //   getVendorBooking();
+                                                                                      // }
+                                                                                    },
+                                                                                    style: ElevatedButton.styleFrom(
+                                                                                        primary: Colors.red,
+                                                                                        fixedSize: Size(140, 35),
+                                                                                        shape: RoundedRectangleBorder(
+                                                                                          borderRadius: BorderRadius.circular(10),
+                                                                                        )),
+                                                                                    child: Text(
+                                                                                      "Decline",
+                                                                                      style: TextStyle(fontWeight: FontWeight.w400),
+                                                                                    ))
+                                                                              ],
+                                                                            ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                  child: ListView.builder(
-                                                      shrinkWrap: true,
-                                                      physics: NeverScrollableScrollPhysics(),
-                                                      itemCount: model.data!.length,
-                                                      itemBuilder: (context, i) {
-                                                        return cardWidget1(model, i);
-                                                      }),
-                                                )
-                                              : Container(
-                                                  height: 100,
-                                                  child: Center(
-                                                      child: Text(roles !=
-                                                              "Food" ? "No Jobs Found!!" : "No Orders Found!!")),
-                                                );
-                                        } else if (snapshot.hasError) {
-                                          return Icon(Icons.error_outline);
-                                        } else {
-                                          return Container(
+                                                ),
+                                              ),
+                                            )
+                                          : Container(
                                               height: MediaQuery.of(context)
                                                       .size
                                                       .height /
-                                                  1.5,
+                                                  3,
                                               child: Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                color:
-                                                    AppColor().colorPrimary(),
-                                              ),
-                                              ),
-                                          );
-                                        }
-                                      })
-                                  :type == "2" || type == "3" || type == "4" ?
-                                deliveryType == "Food" ?
-                                foodDeliveryModel != null
-                              ? InkWell(
-                              onTap: () {
-                              // model.rides![i].type
-                              // if(model.order![i].bookingsType == "ride_booking") {
-                              //   Navigator.push(context, MaterialPageRoute(builder: (context)=>  OfflinePage("")));
-                              // } else{
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          OrderFoodDelivery(data: foodDeliveryModel,),
-                                  ),
-                              );
-                              // }
-                            },
-                            child: Padding(
-                              padding:
-                              const EdgeInsets.all(
-                                  4.0),
-                              child: Card(
-                                elevation: 5,
-                                shape:
-                                RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius
-                                        .circular(
-                                        15)),
-                                child: Container(
-                                  // padding: EdgeInsets.all(12),
-                                  decoration:
-                                  BoxDecoration(
-                                    border: Border.all(
-                                        color: AppColor
-                                            .PrimaryDark),
-                                    borderRadius:
-                                    BorderRadius
-                                        .circular(15),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Padding(
-                                        padding:
-                                        const EdgeInsets
-                                            .only(
-                                            top: 12.0,
-                                            left: 15,
-                                            right:
-                                            15),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment
-                                              .spaceBetween,
-                                          children: [
-                                            Text(
-                                              "Name",
-                                              style: TextStyle(
-                                                  color: AppColor()
-                                                      .colorPrimary(),
-                                                  fontWeight:
-                                                  FontWeight.normal),
-                                            ),
-                                            Text(
-                                              "${foodDeliveryModel!.username}",
-                                              style: TextStyle(
-                                                  color: AppColor()
-                                                      .colorPrimary(),
-                                                  fontWeight:
-                                                  FontWeight.w600),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                        const EdgeInsets.only(top: 4.0, bottom: 4, left: 15, right: 15),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment
-                                              .spaceBetween,
-                                          children: [
-                                            Text(
-                                              "Date",
-                                              style: TextStyle(
-                                                  color: AppColor()
-                                                      .colorPrimary(),
-                                                  fontWeight:
-                                                  FontWeight.normal),
-                                            ),
-                                            Text(
-                                              "${foodDeliveryModel!.date}",
-                                              style: TextStyle(
-                                                  color: AppColor()
-                                                      .colorPrimary(),
-                                                  fontWeight:
-                                                  FontWeight.w600),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                        const EdgeInsets.only(top: 4.0, bottom: 4, left: 15, right: 15),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment
-                                              .spaceBetween,
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment
-                                              .start,
-                                          children: [
-                                            Text(
-                                              "Address",
-                                              style: TextStyle(
-                                                  color: AppColor()
-                                                      .colorPrimary(),
-                                                  fontWeight:
-                                                  FontWeight.normal),
-                                            ),
-                                            Container(
-                                              width: 180,
-                                              child: Text(
-                                                "${foodDeliveryModel!.deliveryAddress}",
-                                                maxLines:
-                                                2,
-                                                style: TextStyle(
-                                                    color: AppColor()
-                                                        .colorPrimary(),
-                                                    fontWeight: FontWeight
-                                                        .w600,
-                                                    overflow:
-                                                    TextOverflow.ellipsis),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                        const EdgeInsets
-                                            .only(
-                                            top: 4.0,
-                                            bottom: 4,
-                                            left: 15,
-                                            right:
-                                            15),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment
-                                              .spaceBetween,
-                                          children: [
-                                            Text(
-                                              "Amount",
-                                              style: TextStyle(
-                                                  color: AppColor()
-                                                      .colorPrimary(),
-                                                  fontWeight:
-                                                  FontWeight.normal),
-                                            ),
-                                            Text(
-                                              "₹ ${foodDeliveryModel!.total}",
-                                              style: TextStyle(
-                                                  color: AppColor()
-                                                      .colorPrimary(),
-                                                  fontWeight:
-                                                  FontWeight.w600),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      // Padding(
-                                      //   padding: const EdgeInsets.only(top: 8.0, bottom: 8),
-                                      //   child: DottedLine(
-                                      //     // direction: Axis.horizontal,
-                                      //     lineLength: 320,
-                                      //     lineThickness: 1.0,
-                                      //     dashLength: 4.0,
-                                      //     dashColor: AppColor().colorPrimary(),
-                                      //     // dashGradient: [Colors.red, Colors.blue],
-                                      //     dashRadius: 0.0,
-                                      //     dashGapLength: 4.0,
-                                      //     dashGapColor: Colors.transparent,
-                                      //     // dashGapGradient: [Colors.red, Colors.blue],
-                                      //     dashGapRadius: 0.0,
-                                      //   ),
-                                      // ),
-                                      Container(
-                                        height: 60,
-                                        width:
-                                        MediaQuery.of(
-                                            context)
-                                            .size
-                                            .width,
-                                        decoration: BoxDecoration(
-                                            color: AppColor()
-                                                .colorPrimary(),
-                                            borderRadius: BorderRadius.only(
-                                                bottomLeft:
-                                                Radius.circular(
-                                                    12),
-                                                bottomRight:
-                                                Radius.circular(
-                                                    12))),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment
-                                              .center,
-                                          children: [
-                                            foodDeliveryModel!
-                                                .orderStatus ==
-                                                "3"
-                                                ? Padding(
-                                              padding:
-                                              const EdgeInsets.only(top: 7.0),
-                                              child:
-                                              Center(
-                                                child: ElevatedButton(
-                                                    onPressed: () {
-                                                      //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
-                                                    },
-                                                    style: ElevatedButton.styleFrom(
-                                                        primary: Colors.green,
-                                                        fixedSize: Size(140, 35),
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.circular(10),
-                                                        )),
-                                                    child: Text(
-                                                      "Delivered",
-                                                      style: TextStyle(fontWeight: FontWeight.w400),
-                                                    )),
-                                              ),
-                                            )
-                                                : foodDeliveryModel!.orderStatus ==
-                                                "5"
-                                                ? Padding(
-                                              padding: const EdgeInsets.only(top: 7.0),
-                                              child: Center(
-                                                child: ElevatedButton(
-                                                    onPressed: () {
-                                                      //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
-                                                    },
-                                                    style: ElevatedButton.styleFrom(
-                                                        primary: Colors.green,
-                                                        fixedSize: Size(140, 35),
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.circular(10),
-                                                        )),
-                                                    child: Text(
-                                                      "Accepted",
-                                                      style: TextStyle(fontWeight: FontWeight.w400),
-                                                    )),
-                                              ),
-                                            )
-                                                : foodDeliveryModel!.orderStatus == "6"
-                                                ? Padding(
-                                              padding: const EdgeInsets.only(top: 7.0),
-                                              child: ElevatedButton(
-                                                  onPressed: () {
-                                                    // updateFoodOrderStatus(
-                                                    //     "${foodDeliveryModel!.orderId}", "4");
-                                                    // if(type =="1"){
-                                                    //   getFoodOrders();
-                                                    // }else{
-                                                    //   getVendorBooking();
-                                                    // }
-                                                  },
-                                                  style: ElevatedButton.styleFrom(
-                                                      primary: Colors.red,
-                                                      fixedSize: Size(140, 35),
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(10),
-                                                      )),
                                                   child: Text(
-                                                    "Declined",
-                                                    style: TextStyle(fontWeight: FontWeight.w400),
-                                                  )),
+                                                      "No Bookings found!")),
                                             )
-                                                : Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: [
-                                                ElevatedButton(
-                                                    onPressed: () {
-                                                      updateFoodDeliveryStatus("${foodDeliveryModel!.orderId}", "5");
-                                                      // if(type =="1"){
-                                                      //   getFoodOrders();
-                                                      // }else{
-                                                      //   getVendorBooking();
-                                                      // }
-                                                    },
-                                                    style: ElevatedButton.styleFrom(
-                                                        primary: Colors.green,
-                                                        fixedSize: Size(140, 35),
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.circular(10),
-                                                        )),
-                                                    child: Text(
-                                                      "Accept",
-                                                      style: TextStyle(fontWeight: FontWeight.w400),
-                                                    )),
-                                                const SizedBox(
-                                                  width: 15,
-                                                ),
-                                                ElevatedButton(
-                                                    onPressed: () {
-                                                      updateFoodDeliveryStatus("${foodDeliveryModel!.orderId}", "6");
-                                                      // if(type =="1"){
-                                                      //   getFoodOrders();
-                                                      // }else{
-                                                      //   getVendorBooking();
-                                                      // }
-                                                    },
-                                                    style: ElevatedButton.styleFrom(
-                                                        primary: Colors.red,
-                                                        fixedSize: Size(140, 35),
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.circular(10),
-                                                        )),
-                                                    child: Text(
-                                                      "Decline",
-                                                      style: TextStyle(fontWeight: FontWeight.w400),
-                                                    ))
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ):Container(
-                            height: MediaQuery.of(context)
-                                .size
-                                .height /
-                                3,
-                            child: Center(
-                                child: Text(
-                                    "No Bookings found!")),
-                          )
                                       : deliveryModel == null
                                           ? Container(
                                               height: 100,
@@ -4729,10 +4828,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                             )
                                           : InkWell(
                                               onTap: () {
-                                                Navigator.push(context,
-                                                    MaterialPageRoute(builder: (context) => BottomBarDelivery(
-                                                      index: 1,
-                                                    )));
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            BottomBarDelivery(
+                                                              index: 1,
+                                                            )));
                                                 // Navigator.push(
                                                 //     context,
                                                 //     MaterialPageRoute(
@@ -4981,13 +5083,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                           12),
                                                                   bottomRight: Radius
                                                                       .circular(
-                                                                          12)
-                                                              )
-                                                          ),
+                                                                          12))),
                                                           child: Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .center,
                                                             children: [
-                                                              deliveryModel!.status ==
+                                                              deliveryModel!
+                                                                          .status ==
                                                                       "0"
                                                                   ? Padding(
                                                                       padding: const EdgeInsets
@@ -5012,7 +5115,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                             )),
                                                                       ),
                                                                     )
-                                                                  : deliveryModel!.status == "4"
+                                                                  : deliveryModel!
+                                                                              .status ==
+                                                                          "4"
                                                                       ? Padding(
                                                                           padding:
                                                                               const EdgeInsets.only(top: 7.0),
@@ -5106,372 +5211,372 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 ),
                                               ),
                                             )
-                                      // : type == "2"
-                                      //     ? // ?  deliveryType == "food" ?
-                                      //     foodDeliveryModel != null
-                                      //         ? InkWell(
-                                      //             onTap: () {
-                                      //               // model.rides![i].type
-                                      //               // if(model.order![i].bookingsType == "ride_booking") {
-                                      //               //   Navigator.push(context, MaterialPageRoute(builder: (context)=>  OfflinePage("")));
-                                      //               // } else{
-                                      //               Navigator.push(
-                                      //                   context,
-                                      //                   MaterialPageRoute(
-                                      //                       builder: (context) =>
-                                      //                           OrderFoodDelivery(
-                                      //                             data:
-                                      //                                 foodDeliveryModel,
-                                      //                           )));
-                                      //               // }
-                                      //             },
-                                      //             child: Padding(
-                                      //               padding:
-                                      //                   const EdgeInsets.all(
-                                      //                       4.0),
-                                      //               child: Card(
-                                      //                 elevation: 5,
-                                      //                 shape:
-                                      //                     RoundedRectangleBorder(
-                                      //                         borderRadius:
-                                      //                             BorderRadius
-                                      //                                 .circular(
-                                      //                                     15)),
-                                      //                 child: Container(
-                                      //                   // padding: EdgeInsets.all(12),
-                                      //                   decoration:
-                                      //                       BoxDecoration(
-                                      //                     border: Border.all(
-                                      //                         color: AppColor
-                                      //                             .PrimaryDark),
-                                      //                     borderRadius:
-                                      //                         BorderRadius
-                                      //                             .circular(15),
-                                      //                   ),
-                                      //                   child: Column(
-                                      //                     children: [
-                                      //                       Padding(
-                                      //                         padding:
-                                      //                             const EdgeInsets
-                                      //                                     .only(
-                                      //                                 top: 12.0,
-                                      //                                 left: 15,
-                                      //                                 right:
-                                      //                                     15),
-                                      //                         child: Row(
-                                      //                           mainAxisAlignment:
-                                      //                               MainAxisAlignment
-                                      //                                   .spaceBetween,
-                                      //                           children: [
-                                      //                             Text(
-                                      //                               "Name",
-                                      //                               style: TextStyle(
-                                      //                                   color: AppColor()
-                                      //                                       .colorPrimary(),
-                                      //                                   fontWeight:
-                                      //                                       FontWeight.normal),
-                                      //                             ),
-                                      //                             Text(
-                                      //                               "${foodDeliveryModel!.username}",
-                                      //                               style: TextStyle(
-                                      //                                   color: AppColor()
-                                      //                                       .colorPrimary(),
-                                      //                                   fontWeight:
-                                      //                                       FontWeight.w600),
-                                      //                             )
-                                      //                           ],
-                                      //                         ),
-                                      //                       ),
-                                      //                       Padding(
-                                      //                         padding:
-                                      //                             const EdgeInsets
-                                      //                                     .only(
-                                      //                                 top: 4.0,
-                                      //                                 bottom: 4,
-                                      //                                 left: 15,
-                                      //                                 right:
-                                      //                                     15),
-                                      //                         child: Row(
-                                      //                           mainAxisAlignment:
-                                      //                               MainAxisAlignment
-                                      //                                   .spaceBetween,
-                                      //                           children: [
-                                      //                             Text(
-                                      //                               "Date & Time",
-                                      //                               style: TextStyle(
-                                      //                                   color: AppColor()
-                                      //                                       .colorPrimary(),
-                                      //                                   fontWeight:
-                                      //                                       FontWeight.normal),
-                                      //                             ),
-                                      //                             Text(
-                                      //                               "${foodDeliveryModel!.date}",
-                                      //                               style: TextStyle(
-                                      //                                   color: AppColor()
-                                      //                                       .colorPrimary(),
-                                      //                                   fontWeight:
-                                      //                                       FontWeight.w600),
-                                      //                             )
-                                      //                           ],
-                                      //                         ),
-                                      //                       ),
-                                      //                       Padding(
-                                      //                         padding:
-                                      //                             const EdgeInsets
-                                      //                                     .only(
-                                      //                                 top: 4.0,
-                                      //                                 bottom: 4,
-                                      //                                 left: 15,
-                                      //                                 right:
-                                      //                                     15),
-                                      //                         child: Row(
-                                      //                           mainAxisAlignment:
-                                      //                               MainAxisAlignment
-                                      //                                   .spaceBetween,
-                                      //                           crossAxisAlignment:
-                                      //                               CrossAxisAlignment
-                                      //                                   .start,
-                                      //                           children: [
-                                      //                             Text(
-                                      //                               "Address",
-                                      //                               style: TextStyle(
-                                      //                                   color: AppColor()
-                                      //                                       .colorPrimary(),
-                                      //                                   fontWeight:
-                                      //                                       FontWeight.normal),
-                                      //                             ),
-                                      //                             Container(
-                                      //                               width: 180,
-                                      //                               child: Text(
-                                      //                                 // "",
-                                      //                                 "${foodDeliveryModel!.deliveryAddress}",
-                                      //                                 maxLines:
-                                      //                                     2,
-                                      //                                 style: TextStyle(
-                                      //                                     color: AppColor()
-                                      //                                         .colorPrimary(),
-                                      //                                     fontWeight: FontWeight
-                                      //                                         .w600,
-                                      //                                     overflow:
-                                      //                                         TextOverflow.ellipsis),
-                                      //                               ),
-                                      //                             )
-                                      //                           ],
-                                      //                         ),
-                                      //                       ),
-                                      //                       Padding(
-                                      //                         padding:
-                                      //                             const EdgeInsets
-                                      //                                     .only(
-                                      //                                 top: 4.0,
-                                      //                                 bottom: 4,
-                                      //                                 left: 15,
-                                      //                                 right:
-                                      //                                     15),
-                                      //                         child: Row(
-                                      //                           mainAxisAlignment:
-                                      //                               MainAxisAlignment
-                                      //                                   .spaceBetween,
-                                      //                           children: [
-                                      //                             Text(
-                                      //                               "Amount",
-                                      //                               style: TextStyle(
-                                      //                                   color: AppColor()
-                                      //                                       .colorPrimary(),
-                                      //                                   fontWeight:
-                                      //                                       FontWeight.normal),
-                                      //                             ),
-                                      //                             Text(
-                                      //                               "₹ ${foodDeliveryModel!.total}",
-                                      //                               style: TextStyle(
-                                      //                                   color: AppColor()
-                                      //                                       .colorPrimary(),
-                                      //                                   fontWeight:
-                                      //                                       FontWeight.w600),
-                                      //                             )
-                                      //                           ],
-                                      //                         ),
-                                      //                       ),
-                                      //                       SizedBox(
-                                      //                         height: 10,
-                                      //                       ),
-                                      //                       // Padding(
-                                      //                       //   padding: const EdgeInsets.only(top: 8.0, bottom: 8),
-                                      //                       //   child: DottedLine(
-                                      //                       //     // direction: Axis.horizontal,
-                                      //                       //     lineLength: 320,
-                                      //                       //     lineThickness: 1.0,
-                                      //                       //     dashLength: 4.0,
-                                      //                       //     dashColor: AppColor().colorPrimary(),
-                                      //                       //     // dashGradient: [Colors.red, Colors.blue],
-                                      //                       //     dashRadius: 0.0,
-                                      //                       //     dashGapLength: 4.0,
-                                      //                       //     dashGapColor: Colors.transparent,
-                                      //                       //     // dashGapGradient: [Colors.red, Colors.blue],
-                                      //                       //     dashGapRadius: 0.0,
-                                      //                       //   ),
-                                      //                       // ),
-                                      //                       Container(
-                                      //                         height: 60,
-                                      //                         width:
-                                      //                             MediaQuery.of(
-                                      //                                     context)
-                                      //                                 .size
-                                      //                                 .width,
-                                      //                         decoration: BoxDecoration(
-                                      //                             color: AppColor()
-                                      //                                 .colorPrimary(),
-                                      //                             borderRadius: BorderRadius.only(
-                                      //                                 bottomLeft:
-                                      //                                     Radius.circular(
-                                      //                                         12),
-                                      //                                 bottomRight:
-                                      //                                     Radius.circular(
-                                      //                                         12))),
-                                      //                         child: Column(
-                                      //                           crossAxisAlignment:
-                                      //                               CrossAxisAlignment
-                                      //                                   .center,
-                                      //                           children: [
-                                      //                             foodDeliveryModel!
-                                      //                                         .orderStatus ==
-                                      //                                     "3"
-                                      //                                 ? Padding(
-                                      //                                     padding:
-                                      //                                         const EdgeInsets.only(top: 7.0),
-                                      //                                     child:
-                                      //                                         Center(
-                                      //                                       child: ElevatedButton(
-                                      //                                           onPressed: () {
-                                      //                                             //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
-                                      //                                           },
-                                      //                                           style: ElevatedButton.styleFrom(
-                                      //                                               primary: Colors.green,
-                                      //                                               fixedSize: Size(140, 35),
-                                      //                                               shape: RoundedRectangleBorder(
-                                      //                                                 borderRadius: BorderRadius.circular(10),
-                                      //                                               )),
-                                      //                                           child: Text(
-                                      //                                             "Delivered",
-                                      //                                             style: TextStyle(fontWeight: FontWeight.w400),
-                                      //                                           )),
-                                      //                                     ),
-                                      //                                   )
-                                      //                                 : foodDeliveryModel!.orderStatus ==
-                                      //                                         "5"
-                                      //                                     ? Padding(
-                                      //                                         padding: const EdgeInsets.only(top: 7.0),
-                                      //                                         child: Center(
-                                      //                                           child: ElevatedButton(
-                                      //                                               onPressed: () {
-                                      //                                                 //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
-                                      //                                               },
-                                      //                                               style: ElevatedButton.styleFrom(
-                                      //                                                   primary: Colors.green,
-                                      //                                                   fixedSize: Size(140, 35),
-                                      //                                                   shape: RoundedRectangleBorder(
-                                      //                                                     borderRadius: BorderRadius.circular(10),
-                                      //                                                   )),
-                                      //                                               child: Text(
-                                      //                                                 "Accepted",
-                                      //                                                 style: TextStyle(fontWeight: FontWeight.w400),
-                                      //                                               )),
-                                      //                                         ),
-                                      //                                       )
-                                      //                                     : foodDeliveryModel!.orderStatus == "6"
-                                      //                                         ? Padding(
-                                      //                                             padding: const EdgeInsets.only(top: 7.0),
-                                      //                                             child: ElevatedButton(
-                                      //                                                 onPressed: () {
-                                      //                                                   // updateFoodOrderStatus(
-                                      //                                                   //     "${foodDeliveryModel!.orderId}", "4");
-                                      //                                                   // if(type =="1"){
-                                      //                                                   //   getFoodOrders();
-                                      //                                                   // }else{
-                                      //                                                   //   getVendorBooking();
-                                      //                                                   // }
-                                      //                                                 },
-                                      //                                                 style: ElevatedButton.styleFrom(
-                                      //                                                     primary: Colors.red,
-                                      //                                                     fixedSize: Size(140, 35),
-                                      //                                                     shape: RoundedRectangleBorder(
-                                      //                                                       borderRadius: BorderRadius.circular(10),
-                                      //                                                     )),
-                                      //                                                 child: Text(
-                                      //                                                   "Declined",
-                                      //                                                   style: TextStyle(fontWeight: FontWeight.w400),
-                                      //                                                 )),
-                                      //                                           )
-                                      //                                         : Row(
-                                      //                                             mainAxisAlignment: MainAxisAlignment.center,
-                                      //                                             crossAxisAlignment: CrossAxisAlignment.center,
-                                      //                                             children: [
-                                      //                                               ElevatedButton(
-                                      //                                                   onPressed: () {
-                                      //                                                     updateFoodDeliveryStatus("${foodDeliveryModel!.orderId}", "5");
-                                      //
-                                      //                                                     // if(type =="1"){
-                                      //                                                     //   getFoodOrders();
-                                      //                                                     // }else{
-                                      //                                                     //   getVendorBooking();
-                                      //                                                     // }
-                                      //                                                   },
-                                      //                                                   style: ElevatedButton.styleFrom(
-                                      //                                                       primary: Colors.green,
-                                      //                                                       fixedSize: Size(140, 35),
-                                      //                                                       shape: RoundedRectangleBorder(
-                                      //                                                         borderRadius: BorderRadius.circular(10),
-                                      //                                                       )),
-                                      //                                                   child: Text(
-                                      //                                                     "Accept",
-                                      //                                                     style: TextStyle(fontWeight: FontWeight.w400),
-                                      //                                                   )),
-                                      //                                               const SizedBox(
-                                      //                                                 width: 15,
-                                      //                                               ),
-                                      //                                               ElevatedButton(
-                                      //                                                   onPressed: () {
-                                      //                                                     updateFoodDeliveryStatus("${foodDeliveryModel!.orderId}", "6");
-                                      //                                                     // if(type =="1"){
-                                      //                                                     //   getFoodOrders();
-                                      //                                                     // }else{
-                                      //                                                     //   getVendorBooking();
-                                      //                                                     // }
-                                      //                                                   },
-                                      //                                                   style: ElevatedButton.styleFrom(
-                                      //                                                       primary: Colors.red,
-                                      //                                                       fixedSize: Size(140, 35),
-                                      //                                                       shape: RoundedRectangleBorder(
-                                      //                                                         borderRadius: BorderRadius.circular(10),
-                                      //                                                       )),
-                                      //                                                   child: Text(
-                                      //                                                     "Decline",
-                                      //                                                     style: TextStyle(fontWeight: FontWeight.w400),
-                                      //                                                   ))
-                                      //                                             ],
-                                      //                                           ),
-                                      //                           ],
-                                      //                         ),
-                                      //                       ),
-                                      //                     ],
-                                      //                   ),
-                                      //                 ),
-                                      //               ),
-                                      //             ),
-                                      //           )
-                                      //         : Container(
-                                      //             height: MediaQuery.of(context)
-                                      //                     .size
-                                      //                     .height /
-                                      //                 3,
-                                      //             child: Center(
-                                      //                 child: Text(
-                                      //                     "No Bookings found!")),
-                                      //           )
-                                          : Center(
-                                              child: CircularProgressIndicator(
-                                              color: AppColor().colorPrimary(),
-                                            )),
+                                  // : type == "2"
+                                  //     ? // ?  deliveryType == "food" ?
+                                  //     foodDeliveryModel != null
+                                  //         ? InkWell(
+                                  //             onTap: () {
+                                  //               // model.rides![i].type
+                                  //               // if(model.order![i].bookingsType == "ride_booking") {
+                                  //               //   Navigator.push(context, MaterialPageRoute(builder: (context)=>  OfflinePage("")));
+                                  //               // } else{
+                                  //               Navigator.push(
+                                  //                   context,
+                                  //                   MaterialPageRoute(
+                                  //                       builder: (context) =>
+                                  //                           OrderFoodDelivery(
+                                  //                             data:
+                                  //                                 foodDeliveryModel,
+                                  //                           )));
+                                  //               // }
+                                  //             },
+                                  //             child: Padding(
+                                  //               padding:
+                                  //                   const EdgeInsets.all(
+                                  //                       4.0),
+                                  //               child: Card(
+                                  //                 elevation: 5,
+                                  //                 shape:
+                                  //                     RoundedRectangleBorder(
+                                  //                         borderRadius:
+                                  //                             BorderRadius
+                                  //                                 .circular(
+                                  //                                     15)),
+                                  //                 child: Container(
+                                  //                   // padding: EdgeInsets.all(12),
+                                  //                   decoration:
+                                  //                       BoxDecoration(
+                                  //                     border: Border.all(
+                                  //                         color: AppColor
+                                  //                             .PrimaryDark),
+                                  //                     borderRadius:
+                                  //                         BorderRadius
+                                  //                             .circular(15),
+                                  //                   ),
+                                  //                   child: Column(
+                                  //                     children: [
+                                  //                       Padding(
+                                  //                         padding:
+                                  //                             const EdgeInsets
+                                  //                                     .only(
+                                  //                                 top: 12.0,
+                                  //                                 left: 15,
+                                  //                                 right:
+                                  //                                     15),
+                                  //                         child: Row(
+                                  //                           mainAxisAlignment:
+                                  //                               MainAxisAlignment
+                                  //                                   .spaceBetween,
+                                  //                           children: [
+                                  //                             Text(
+                                  //                               "Name",
+                                  //                               style: TextStyle(
+                                  //                                   color: AppColor()
+                                  //                                       .colorPrimary(),
+                                  //                                   fontWeight:
+                                  //                                       FontWeight.normal),
+                                  //                             ),
+                                  //                             Text(
+                                  //                               "${foodDeliveryModel!.username}",
+                                  //                               style: TextStyle(
+                                  //                                   color: AppColor()
+                                  //                                       .colorPrimary(),
+                                  //                                   fontWeight:
+                                  //                                       FontWeight.w600),
+                                  //                             )
+                                  //                           ],
+                                  //                         ),
+                                  //                       ),
+                                  //                       Padding(
+                                  //                         padding:
+                                  //                             const EdgeInsets
+                                  //                                     .only(
+                                  //                                 top: 4.0,
+                                  //                                 bottom: 4,
+                                  //                                 left: 15,
+                                  //                                 right:
+                                  //                                     15),
+                                  //                         child: Row(
+                                  //                           mainAxisAlignment:
+                                  //                               MainAxisAlignment
+                                  //                                   .spaceBetween,
+                                  //                           children: [
+                                  //                             Text(
+                                  //                               "Date & Time",
+                                  //                               style: TextStyle(
+                                  //                                   color: AppColor()
+                                  //                                       .colorPrimary(),
+                                  //                                   fontWeight:
+                                  //                                       FontWeight.normal),
+                                  //                             ),
+                                  //                             Text(
+                                  //                               "${foodDeliveryModel!.date}",
+                                  //                               style: TextStyle(
+                                  //                                   color: AppColor()
+                                  //                                       .colorPrimary(),
+                                  //                                   fontWeight:
+                                  //                                       FontWeight.w600),
+                                  //                             )
+                                  //                           ],
+                                  //                         ),
+                                  //                       ),
+                                  //                       Padding(
+                                  //                         padding:
+                                  //                             const EdgeInsets
+                                  //                                     .only(
+                                  //                                 top: 4.0,
+                                  //                                 bottom: 4,
+                                  //                                 left: 15,
+                                  //                                 right:
+                                  //                                     15),
+                                  //                         child: Row(
+                                  //                           mainAxisAlignment:
+                                  //                               MainAxisAlignment
+                                  //                                   .spaceBetween,
+                                  //                           crossAxisAlignment:
+                                  //                               CrossAxisAlignment
+                                  //                                   .start,
+                                  //                           children: [
+                                  //                             Text(
+                                  //                               "Address",
+                                  //                               style: TextStyle(
+                                  //                                   color: AppColor()
+                                  //                                       .colorPrimary(),
+                                  //                                   fontWeight:
+                                  //                                       FontWeight.normal),
+                                  //                             ),
+                                  //                             Container(
+                                  //                               width: 180,
+                                  //                               child: Text(
+                                  //                                 // "",
+                                  //                                 "${foodDeliveryModel!.deliveryAddress}",
+                                  //                                 maxLines:
+                                  //                                     2,
+                                  //                                 style: TextStyle(
+                                  //                                     color: AppColor()
+                                  //                                         .colorPrimary(),
+                                  //                                     fontWeight: FontWeight
+                                  //                                         .w600,
+                                  //                                     overflow:
+                                  //                                         TextOverflow.ellipsis),
+                                  //                               ),
+                                  //                             )
+                                  //                           ],
+                                  //                         ),
+                                  //                       ),
+                                  //                       Padding(
+                                  //                         padding:
+                                  //                             const EdgeInsets
+                                  //                                     .only(
+                                  //                                 top: 4.0,
+                                  //                                 bottom: 4,
+                                  //                                 left: 15,
+                                  //                                 right:
+                                  //                                     15),
+                                  //                         child: Row(
+                                  //                           mainAxisAlignment:
+                                  //                               MainAxisAlignment
+                                  //                                   .spaceBetween,
+                                  //                           children: [
+                                  //                             Text(
+                                  //                               "Amount",
+                                  //                               style: TextStyle(
+                                  //                                   color: AppColor()
+                                  //                                       .colorPrimary(),
+                                  //                                   fontWeight:
+                                  //                                       FontWeight.normal),
+                                  //                             ),
+                                  //                             Text(
+                                  //                               "₹ ${foodDeliveryModel!.total}",
+                                  //                               style: TextStyle(
+                                  //                                   color: AppColor()
+                                  //                                       .colorPrimary(),
+                                  //                                   fontWeight:
+                                  //                                       FontWeight.w600),
+                                  //                             )
+                                  //                           ],
+                                  //                         ),
+                                  //                       ),
+                                  //                       SizedBox(
+                                  //                         height: 10,
+                                  //                       ),
+                                  //                       // Padding(
+                                  //                       //   padding: const EdgeInsets.only(top: 8.0, bottom: 8),
+                                  //                       //   child: DottedLine(
+                                  //                       //     // direction: Axis.horizontal,
+                                  //                       //     lineLength: 320,
+                                  //                       //     lineThickness: 1.0,
+                                  //                       //     dashLength: 4.0,
+                                  //                       //     dashColor: AppColor().colorPrimary(),
+                                  //                       //     // dashGradient: [Colors.red, Colors.blue],
+                                  //                       //     dashRadius: 0.0,
+                                  //                       //     dashGapLength: 4.0,
+                                  //                       //     dashGapColor: Colors.transparent,
+                                  //                       //     // dashGapGradient: [Colors.red, Colors.blue],
+                                  //                       //     dashGapRadius: 0.0,
+                                  //                       //   ),
+                                  //                       // ),
+                                  //                       Container(
+                                  //                         height: 60,
+                                  //                         width:
+                                  //                             MediaQuery.of(
+                                  //                                     context)
+                                  //                                 .size
+                                  //                                 .width,
+                                  //                         decoration: BoxDecoration(
+                                  //                             color: AppColor()
+                                  //                                 .colorPrimary(),
+                                  //                             borderRadius: BorderRadius.only(
+                                  //                                 bottomLeft:
+                                  //                                     Radius.circular(
+                                  //                                         12),
+                                  //                                 bottomRight:
+                                  //                                     Radius.circular(
+                                  //                                         12))),
+                                  //                         child: Column(
+                                  //                           crossAxisAlignment:
+                                  //                               CrossAxisAlignment
+                                  //                                   .center,
+                                  //                           children: [
+                                  //                             foodDeliveryModel!
+                                  //                                         .orderStatus ==
+                                  //                                     "3"
+                                  //                                 ? Padding(
+                                  //                                     padding:
+                                  //                                         const EdgeInsets.only(top: 7.0),
+                                  //                                     child:
+                                  //                                         Center(
+                                  //                                       child: ElevatedButton(
+                                  //                                           onPressed: () {
+                                  //                                             //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
+                                  //                                           },
+                                  //                                           style: ElevatedButton.styleFrom(
+                                  //                                               primary: Colors.green,
+                                  //                                               fixedSize: Size(140, 35),
+                                  //                                               shape: RoundedRectangleBorder(
+                                  //                                                 borderRadius: BorderRadius.circular(10),
+                                  //                                               )),
+                                  //                                           child: Text(
+                                  //                                             "Delivered",
+                                  //                                             style: TextStyle(fontWeight: FontWeight.w400),
+                                  //                                           )),
+                                  //                                     ),
+                                  //                                   )
+                                  //                                 : foodDeliveryModel!.orderStatus ==
+                                  //                                         "5"
+                                  //                                     ? Padding(
+                                  //                                         padding: const EdgeInsets.only(top: 7.0),
+                                  //                                         child: Center(
+                                  //                                           child: ElevatedButton(
+                                  //                                               onPressed: () {
+                                  //                                                 //updateFoodOrderStatus("${model.orders![i].orderId.toString()}","1" );
+                                  //                                               },
+                                  //                                               style: ElevatedButton.styleFrom(
+                                  //                                                   primary: Colors.green,
+                                  //                                                   fixedSize: Size(140, 35),
+                                  //                                                   shape: RoundedRectangleBorder(
+                                  //                                                     borderRadius: BorderRadius.circular(10),
+                                  //                                                   )),
+                                  //                                               child: Text(
+                                  //                                                 "Accepted",
+                                  //                                                 style: TextStyle(fontWeight: FontWeight.w400),
+                                  //                                               )),
+                                  //                                         ),
+                                  //                                       )
+                                  //                                     : foodDeliveryModel!.orderStatus == "6"
+                                  //                                         ? Padding(
+                                  //                                             padding: const EdgeInsets.only(top: 7.0),
+                                  //                                             child: ElevatedButton(
+                                  //                                                 onPressed: () {
+                                  //                                                   // updateFoodOrderStatus(
+                                  //                                                   //     "${foodDeliveryModel!.orderId}", "4");
+                                  //                                                   // if(type =="1"){
+                                  //                                                   //   getFoodOrders();
+                                  //                                                   // }else{
+                                  //                                                   //   getVendorBooking();
+                                  //                                                   // }
+                                  //                                                 },
+                                  //                                                 style: ElevatedButton.styleFrom(
+                                  //                                                     primary: Colors.red,
+                                  //                                                     fixedSize: Size(140, 35),
+                                  //                                                     shape: RoundedRectangleBorder(
+                                  //                                                       borderRadius: BorderRadius.circular(10),
+                                  //                                                     )),
+                                  //                                                 child: Text(
+                                  //                                                   "Declined",
+                                  //                                                   style: TextStyle(fontWeight: FontWeight.w400),
+                                  //                                                 )),
+                                  //                                           )
+                                  //                                         : Row(
+                                  //                                             mainAxisAlignment: MainAxisAlignment.center,
+                                  //                                             crossAxisAlignment: CrossAxisAlignment.center,
+                                  //                                             children: [
+                                  //                                               ElevatedButton(
+                                  //                                                   onPressed: () {
+                                  //                                                     updateFoodDeliveryStatus("${foodDeliveryModel!.orderId}", "5");
+                                  //
+                                  //                                                     // if(type =="1"){
+                                  //                                                     //   getFoodOrders();
+                                  //                                                     // }else{
+                                  //                                                     //   getVendorBooking();
+                                  //                                                     // }
+                                  //                                                   },
+                                  //                                                   style: ElevatedButton.styleFrom(
+                                  //                                                       primary: Colors.green,
+                                  //                                                       fixedSize: Size(140, 35),
+                                  //                                                       shape: RoundedRectangleBorder(
+                                  //                                                         borderRadius: BorderRadius.circular(10),
+                                  //                                                       )),
+                                  //                                                   child: Text(
+                                  //                                                     "Accept",
+                                  //                                                     style: TextStyle(fontWeight: FontWeight.w400),
+                                  //                                                   )),
+                                  //                                               const SizedBox(
+                                  //                                                 width: 15,
+                                  //                                               ),
+                                  //                                               ElevatedButton(
+                                  //                                                   onPressed: () {
+                                  //                                                     updateFoodDeliveryStatus("${foodDeliveryModel!.orderId}", "6");
+                                  //                                                     // if(type =="1"){
+                                  //                                                     //   getFoodOrders();
+                                  //                                                     // }else{
+                                  //                                                     //   getVendorBooking();
+                                  //                                                     // }
+                                  //                                                   },
+                                  //                                                   style: ElevatedButton.styleFrom(
+                                  //                                                       primary: Colors.red,
+                                  //                                                       fixedSize: Size(140, 35),
+                                  //                                                       shape: RoundedRectangleBorder(
+                                  //                                                         borderRadius: BorderRadius.circular(10),
+                                  //                                                       )),
+                                  //                                                   child: Text(
+                                  //                                                     "Decline",
+                                  //                                                     style: TextStyle(fontWeight: FontWeight.w400),
+                                  //                                                   ))
+                                  //                                             ],
+                                  //                                           ),
+                                  //                           ],
+                                  //                         ),
+                                  //                       ),
+                                  //                     ],
+                                  //                   ),
+                                  //                 ),
+                                  //               ),
+                                  //             ),
+                                  //           )
+                                  //         : Container(
+                                  //             height: MediaQuery.of(context)
+                                  //                     .size
+                                  //                     .height /
+                                  //                 3,
+                                  //             child: Center(
+                                  //                 child: Text(
+                                  //                     "No Bookings found!")),
+                                  //           )
+                                  : Center(
+                                      child: CircularProgressIndicator(
+                                      color: AppColor().colorPrimary(),
+                                    )),
 
                           const SizedBox(
                             height: 80,

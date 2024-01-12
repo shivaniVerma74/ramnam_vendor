@@ -61,6 +61,7 @@ class _ForgetScreenState extends State<ForgetScreen>
     _controller.dispose();
     super.dispose();
   }
+
   int? newPass;
 
   Future forgetPasswordRequest() async {
@@ -70,7 +71,6 @@ class _ForgetScreenState extends State<ForgetScreen>
       // '${userId.toString()}'
     });
     print("this is request !! ${request.fields} and ${Apipath.forgetPassUrl}");
-
     http.StreamedResponse response = await request.send();
     print("this is request !! 11111${response}");
     if (response.statusCode == 200) {
@@ -81,7 +81,6 @@ class _ForgetScreenState extends State<ForgetScreen>
       setState((){
         newPass = data.newPass;
       });
-
     } else {
       return null;
     }
@@ -102,7 +101,6 @@ class _ForgetScreenState extends State<ForgetScreen>
           icon: Icon(Icons.arrow_back_ios,
           color: AppColor.PrimaryDark,),
         ),
-
       ),
       body: SingleChildScrollView(
         child: Padding(

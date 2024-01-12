@@ -226,7 +226,6 @@ class _VerifyOtpState extends State<VerifyOtp> {
               ),
             ),
             SizedBox(height: 20,),
-
             Text(
               resendOtp == null || resendOtp == ""?
               "${widget.otp.toString()}"
@@ -252,7 +251,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
                 ),
                 // Text("${widget.otp}")
                 TextButton(
-                  onPressed: (){
+                  onPressed: () {
                     loginWithOtp();
                   },
                   child: Text(
@@ -262,11 +261,13 @@ class _VerifyOtpState extends State<VerifyOtp> {
                       decoration: TextDecoration.underline,
                         color: AppColor().colorBg1(),
                         fontWeight: FontWeight.w500,
-                        fontSize: 15),
+                        fontSize: 15,
+                    ),
                   ),
-                ),],
+                ),
+              ],
             ),
-            SizedBox(height: 50,),
+            SizedBox(height: 50),
             Padding(
               padding: const EdgeInsets.only(left: 12, right: 12),
               child:
@@ -285,15 +286,13 @@ class _VerifyOtpState extends State<VerifyOtp> {
                         loadingWidget()
                   :  Center(child: Text("Verify Authentication Code", style: TextStyle(fontSize: 18, color: AppColor.PrimaryDark)))
                 ),
-              )
-
+              ),
               // AppBtn(
               //   label: "Verify Authentication Code",
               //   onPress: (){
               //     verifyOTP();
               //   },
               // )
-
             ),
           ],
         ),
@@ -343,13 +342,11 @@ class _VerifyOtpState extends State<VerifyOtp> {
           isLoading = false;
         });
         Fluttertoast.showToast(msg: '${jsonResponse.message.toString()}');
-
         if(type == "2" || type == "3" || type =="4"){
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (context) => BottomBarDelivery(),
-            ),
-                (Route<dynamic> route) => false,
+            ), (Route<dynamic> route) => false,
           );
         }else {
           Navigator.of(context).pushAndRemoveUntil(
@@ -370,7 +367,6 @@ class _VerifyOtpState extends State<VerifyOtp> {
     else {
     print(response.reasonPhrase);
     }
-
   }
 }
 
