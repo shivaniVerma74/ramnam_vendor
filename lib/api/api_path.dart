@@ -3,13 +3,15 @@ class Apipath {
   static const String BASH_URL =
       //"https://sodindia.com/api/";
    //   "https://developmentalphawizz.com/SOD_New/api/";
-  'https://raamnaam.com/api/';
+  // 'https://raamnaam.com/api/';
       //"https://developmentalphawizz.com/new_ondemand/api/";
       //"https://alphawizztest.tk/ondemand/api/";
+      'https://alphawizzserver.com/raamnaam/api/';
       static const String imagePath =
           //"https://sodindia.com/api/";
          // "https://developmentalphawizz.com/SOD_New/";
-      'https://raamnaam.com/';
+      // 'https://raamnaam.com/';
+      'https://alphawizzserver.com/';
       //"https://developmentalphawizz.com/new_ondemand/api/";
 
   static const String phone_login = BASH_URL + 'login_with_contact_vendor';

@@ -478,22 +478,18 @@ class _ProfileState extends State<Profile> {
                                                             "" : bankDetails['ifsc_code'],
                                                             accountType :bankDetails['account_type'] == ""|| bankDetails['account_type'] == null ?
                                                             "Savings" : bankDetails['account_type'],
-                                                          )));
-
+                                                          ),
+                                                  ),
+                                            );
                                             if(result = true){
                                              await getProfile();
                                             }
-
                                           },
                                           label: "Edit Profile",
                                         ),
-
                                         SizedBox(
                                           height: 10,
                                         ),
-
-
-
                                       ],
                                     ),
                                   ),
